@@ -1,4 +1,4 @@
-﻿namespace Shared.Options;
+﻿namespace Shared.Configurations;
 public enum DatabaseType
 {
     SQLServer,

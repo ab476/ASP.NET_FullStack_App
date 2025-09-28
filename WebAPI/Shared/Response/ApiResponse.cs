@@ -5,4 +5,3 @@ public record ApiResponse<T>(
     T? Data = default!,
     string Message = ""
 );
-

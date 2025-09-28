@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Options;
-using Shared.Options;
+using Shared.Configurations;
 
 namespace AuthAPI.Data;
 
-public class AuthDbContextFactory(IOptions<DatabaseOptions> options)
+public class AuthDbContextFactory(IOptions<DatabaseOptions> options) : IDesignTimeDbContextFactory<AuthDbContext>
 {
 
     private readonly DatabaseOptions _dbOptions = options.Value;
@@ -12,7 +13,7 @@ public class AuthDbContextFactory(IOptions<DatabaseOptions> options)
     public void Configure(DbContextOptionsBuilder options)
     {
         var activeDb = _dbOptions.ActiveDatabase;
-        var connStr = _dbOptions.ConnectionStrings[activeDb.ToString()];
+        var connStr = _dbOptions.GetActiveConnectionString();
 
         switch (activeDb)
         {
@@ -33,10 +34,18 @@ public class AuthDbContextFactory(IOptions<DatabaseOptions> options)
                 break;
 
             case DatabaseType.Oracle:
-                options.UseOracle(connStr);
+            {
+                options.UseOracle(connStr)
+                        .UseUpperSnakeCaseNamingConvention();
                 break;
+            }
             default:
                 throw new InvalidOperationException($"Unsupported database: {activeDb}");
         }
+    }
+
+    public AuthDbContext CreateDbContext(string[] args)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -8,9 +8,9 @@ public class TUser : IdentityUser<Guid>
 
     public DateTime? DateOfBirth { get; set; }
     public DateTime? LastLogin { get; set; }
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
     //Audit Columns
-    public DateTime? CreatedOn { get; set; }
+    public DateTime? CreatedOn { get; set; } = DateTime.UtcNow;
     public DateTime? ModifiedOn { get; set; }
     // Navigation property for one-to-many relationsip
     public virtual List<TUserAddress> Addresses { get; set; } = [];

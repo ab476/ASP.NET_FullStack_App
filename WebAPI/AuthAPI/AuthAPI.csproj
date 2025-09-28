@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EFCore.NamingConventions" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
@@ -25,6 +26,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference 
+		Include="..\CoustomSourceGenerator\Common.Generators.csproj"
+		OutputItemType="Analyzer"
+        ReferenceOutputAssembly="false"
+	/>
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
