@@ -1,12 +1,13 @@
-﻿using AuthAPI.Data.Tables;
+﻿using EFCore.NamingConventions.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Data.Configurations;
 
 namespace AuthAPI.Data.TableConfigurations;
 
-public class TUserAddressConfiguration : IEntityTypeConfiguration<TUserAddress>
+public class TUserAddressConfiguration(INameRewriter nameRewriter) : EntityConfigurationBase<TUserAddress>(nameRewriter)
 {
-    public void Configure(EntityTypeBuilder<TUserAddress> builder)
+    public override void Configure(EntityTypeBuilder<TUserAddress> builder)
     {
         builder.HasKey(a => a.Id);
 

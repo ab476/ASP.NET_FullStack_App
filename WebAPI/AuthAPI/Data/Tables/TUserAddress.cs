@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace AuthAPI.Data.Tables;
+﻿namespace AuthAPI.Data.Tables;
 
 public class TUserAddress
 {

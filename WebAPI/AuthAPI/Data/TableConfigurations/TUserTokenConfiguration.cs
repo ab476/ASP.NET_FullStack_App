@@ -1,13 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCore.NamingConventions.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Data.Configurations;
 
 namespace AuthAPI.Data.TableConfigurations;
 
-public class TUserTokenConfiguration : IEntityTypeConfiguration<TUserToken>
+public class TUserTokenConfiguration(INameRewriter nameRewriter) : EntityConfigurationBase<TUserToken>(nameRewriter)
 {
-    public void Configure(EntityTypeBuilder<TUserToken> builder)
+    public override void Configure(EntityTypeBuilder<TUserToken> builder)
     {
-        builder.ToTable("TUserTokens");
+        builder.ToTable(Rewrite(nameof(AuthDbContext.TUserTokens)));
     }
 }
 

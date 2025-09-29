@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Shared.Configurations;
 using System.Net;
 using System.Net.Mail;
 

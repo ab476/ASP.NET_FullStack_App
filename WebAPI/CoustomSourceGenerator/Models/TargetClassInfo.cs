@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using static Common.Generators.Models.ClassToGenerate;
+using static Common.Generators.Models.TargetClassInfo;
 
 namespace Common.Generators.Models;
 
-internal class ClassToGenerate(string namespaceName,
+internal class TargetClassInfo(string namespaceName,
     string className,
-    IEnumerable<ConfigMapping> configs) : IEquatable<ClassToGenerate?>
+    IEnumerable<EntityConfigMapping> configs) : IEquatable<TargetClassInfo?>
 {
     public string NamespaceName { get; } = namespaceName;
     public string ClassName { get; } = className;
-    public IEnumerable<ConfigMapping> Configs { get; } = configs;
+    public IEnumerable<EntityConfigMapping> Configs { get; } = configs;
 
     public override bool Equals(object? obj)
     {
-        return Equals(obj as ClassToGenerate);
+        return Equals(obj as TargetClassInfo);
     }
 
-    public bool Equals(ClassToGenerate? other)
+    public bool Equals(TargetClassInfo? other)
     {
         return other is not null &&
                NamespaceName == other.NamespaceName &&
@@ -35,9 +34,9 @@ internal class ClassToGenerate(string namespaceName,
         return hashCode;
     }
 
-    internal sealed class ConfigMapping : IEquatable<ConfigMapping?>
+    internal sealed class EntityConfigMapping : IEquatable<EntityConfigMapping?>
     {
-        public ConfigMapping(string entityTypeName, string configTypeName)
+        public EntityConfigMapping(string entityTypeName, string configTypeName)
         {
             EntityTypeName = entityTypeName;
             ConfigTypeName = configTypeName;
@@ -46,7 +45,7 @@ internal class ClassToGenerate(string namespaceName,
         public string EntityTypeName { get; }
         public string ConfigTypeName { get; }
 
-        public bool Equals(ConfigMapping? other)
+        public bool Equals(EntityConfigMapping? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -56,15 +55,15 @@ internal class ClassToGenerate(string namespaceName,
         }
 
         public override bool Equals(object? obj) =>
-            Equals(obj as ConfigMapping);
+            Equals(obj as EntityConfigMapping);
 
         public override int GetHashCode() =>
            (EntityTypeName, ConfigTypeName).GetHashCode();
 
-        public static bool operator ==(ConfigMapping? left, ConfigMapping? right) =>
+        public static bool operator ==(EntityConfigMapping? left, EntityConfigMapping? right) =>
             Equals(left, right);
 
-        public static bool operator !=(ConfigMapping? left, ConfigMapping? right) =>
+        public static bool operator !=(EntityConfigMapping? left, EntityConfigMapping? right) =>
             !Equals(left, right);
     }
 }

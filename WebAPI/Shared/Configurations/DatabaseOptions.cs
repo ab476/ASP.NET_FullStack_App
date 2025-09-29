@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Shared.Configurations;
+﻿namespace Shared.Configurations;
 public class DatabaseOptions
 {
     public DatabaseType ActiveDatabase { get; set; }

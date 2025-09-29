@@ -1,14 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCore.NamingConventions.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Data.Configurations;
 
 namespace AuthAPI.Data.TableConfigurations;
 
 
-public class TRoleClaimConfiguration : IEntityTypeConfiguration<TRoleClaim>
+public class TRoleClaimConfiguration(INameRewriter nameRewriter) : EntityConfigurationBase<TRoleClaim>(nameRewriter)
 {
-    public void Configure(EntityTypeBuilder<TRoleClaim> builder)
+    public override void Configure(EntityTypeBuilder<TRoleClaim> builder)
     {
-        builder.ToTable(nameof(TRoleClaim));
+        builder.ToTable(Rewrite(nameof(AuthDbContext.TRoleClaims)));
     }
 }
 
