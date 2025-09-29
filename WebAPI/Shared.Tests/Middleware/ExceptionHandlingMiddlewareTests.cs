@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Common.Middleware;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Shared.Middleware;
 using System.Text.Json;
 
 namespace Shared.Tests.Middleware;

@@ -1,4 +1,4 @@
-﻿namespace Shared.Response;
+﻿namespace Common.Response;
 
 public record ApiResponse<T>(
     bool Success,

@@ -7,7 +7,7 @@ using System.Data.Common;
 using System.Net.Mime;
 using System.Text.Json;
 
-namespace Shared.Middleware;
+namespace Common.Middleware;
 
 /// <summary>
 /// Middleware for centralized exception handling in ASP.NET Core applications.

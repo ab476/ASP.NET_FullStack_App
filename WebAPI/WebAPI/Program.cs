@@ -1,4 +1,3 @@
-using Shared.Middleware;
 using WebAPI.Serialization;
 
 

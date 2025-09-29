@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Shared.Controllers;
+﻿using Common.Controllers;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Shared.Tests.Controllers;
 public class BaseApiControllerTests

@@ -1,5 +1,4 @@
-﻿using Shared.Response;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace WebAPI.Serialization;
 

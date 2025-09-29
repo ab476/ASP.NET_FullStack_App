@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
 
-namespace Shared.Response;
+namespace Common.Response;
 
 /// <summary>
 /// A wrapper around <see cref="ActionResult"/> that automatically

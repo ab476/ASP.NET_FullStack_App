@@ -1,8 +1,8 @@
 ﻿using AuthAPI.Data;
+using Common.Controllers;
+using Common.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Shared.Controllers;
-using Shared.Response;
 
 
 namespace AuthAPI.Controllers;

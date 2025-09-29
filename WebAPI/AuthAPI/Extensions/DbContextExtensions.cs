@@ -1,7 +1,4 @@
-﻿using AuthAPI.Data;
-using Microsoft.EntityFrameworkCore;
-
-namespace AuthAPI.Extensions;
+﻿namespace AuthAPI.Extensions;
 //public class SqlServerAuthDbContext(DbContextOptions<AuthDbContext> options) : AuthDbContext(options) { }
 //public class MySqlAuthDbContext(DbContextOptions<AuthDbContext> options) : AuthDbContext(options) { }
 //public class SQLiteAuthDbContext(DbContextOptions<AuthDbContext> options) : AuthDbContext(options) { }

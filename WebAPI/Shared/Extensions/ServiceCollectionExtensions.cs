@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Shared.Extensions;
+namespace Common.Extensions;
 public static partial class ServiceCollectionExtensions
 {
     public static IServiceCollection ConfigureOptionsFromSection<T>(this IServiceCollection services)

@@ -1,4 +1,4 @@
-﻿namespace Shared.Configurations;
+﻿namespace Common.Configurations;
 public class DatabaseOptions
 {
     public DatabaseType ActiveDatabase { get; set; }

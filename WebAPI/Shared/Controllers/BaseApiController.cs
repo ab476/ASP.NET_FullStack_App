@@ -1,7 +1,6 @@
-﻿
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Shared.Controllers;
+namespace Common.Controllers;
 
 [ApiController]
 public abstract class BaseApiController : ControllerBase

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Shared.Data.Configurations;
+namespace Common.Data.Configurations;
 public abstract class EntityConfigurationBase<TEntity>(INameRewriter nameRewriter) : IEntityTypeConfiguration<TEntity>
     where TEntity : class
 {

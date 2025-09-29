@@ -1,4 +1,4 @@
-﻿namespace Shared.Configurations;
+﻿namespace Common.Configurations;
 public class EmailSettings
 {
     public string SmtpServer { get; set; } = string.Empty;

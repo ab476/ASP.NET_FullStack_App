@@ -1,7 +1,7 @@
-﻿using EFCore.NamingConventions.Internal;
+﻿using Common.Data.Configurations;
+using EFCore.NamingConventions.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Shared.Data.Configurations;
 
 namespace AuthAPI.Data.TableConfigurations;
 

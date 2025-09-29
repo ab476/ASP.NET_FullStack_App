@@ -1,4 +1,5 @@
 ﻿using AuthAPI.Data;
+using AuthAPI.Models.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,8 @@ builder.Services.AddDbContext<AuthDbContext>((sp, options) =>
 });
 builder.Services.AddIdentity<TUser, TRole>()
     .AddEntityFrameworkStores<AuthDbContext>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
 builder.Services.AddControllers();
 

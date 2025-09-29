@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Shared.Response;
+namespace Common.Response;
 
 [JsonSerializable(typeof(ApiResponse<object?>))]
 internal partial class ApiResponseJsonContext : JsonSerializerContext

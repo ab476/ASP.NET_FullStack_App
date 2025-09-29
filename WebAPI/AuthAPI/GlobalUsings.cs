@@ -9,5 +9,7 @@ global using AuthAPI.Models;
 
 global using AuthAPI.Services.IServices;
 
-global using Shared.Configurations;
-global using Shared.Extensions;
+global using Common.Configurations;
+global using Common.Extensions;
+
+global using FluentValidation;

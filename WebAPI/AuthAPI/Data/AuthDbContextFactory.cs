@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 
 namespace AuthAPI.Data;
 
-public class AuthDbContextFactory(IOptions<DatabaseOptions> options) : IDesignTimeDbContextFactory<AuthDbContext>
+public class AuthDbContextFactory(IOptions<DatabaseOptions> options)
 {
 
     private readonly DatabaseOptions _dbOptions = options.Value;
@@ -41,10 +41,10 @@ public class AuthDbContextFactory(IOptions<DatabaseOptions> options) : IDesignTi
             default:
                 throw new InvalidOperationException($"Unsupported database: {activeDb}");
         }
-    }
 
-    public AuthDbContext CreateDbContext(string[] args)
-    {
-        throw new NotImplementedException();
+        if(activeDb is not DatabaseType.Oracle)
+        {
+            options.UseSnakeCaseNamingConvention();
+        }
     }
 }
