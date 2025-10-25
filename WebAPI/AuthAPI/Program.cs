@@ -28,7 +28,7 @@ services.AddOptionsFromConfiguration<IEmailSettings, EmailSettings>("EmailSettin
 builder.Services.AddSingleton<INameRewriter>(provider =>
 {
     var culture = CultureInfo.CurrentCulture;
-    var dbConfig = provider.GetRequiredService<MultiDatabaseConfig>();
+    var dbConfig = provider.GetRequiredService<IMultiDatabaseConfig>();
     return dbConfig.ActiveDatabase switch
     {
         DatabaseType.Oracle => new UpperSnakeCaseNameRewriter(culture),

@@ -2,7 +2,7 @@
 
 namespace AuthAPI.Data;
 
-public class AuthDbContextFactory(MultiDatabaseConfig _dbOptions)
+public class AuthDbContextFactory(IMultiDatabaseConfig _dbOptions)
 {
 
     public void Configure(DbContextOptionsBuilder options)
