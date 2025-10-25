@@ -34,31 +34,30 @@ internal class TargetClassInfo(string namespaceName,
         return hashCode;
     }
 
-    internal sealed class EntityConfigMapping : IEquatable<EntityConfigMapping?>
+    internal sealed class EntityConfigMapping(string entityTypeName, string configTypeName) 
+        : IEquatable<EntityConfigMapping?>
     {
-        public EntityConfigMapping(string entityTypeName, string configTypeName)
-        {
-            EntityTypeName = entityTypeName;
-            ConfigTypeName = configTypeName;
-        }
-
-        public string EntityTypeName { get; }
-        public string ConfigTypeName { get; }
+        public string EntityTypeName { get; } = entityTypeName;
+        public string ConfigTypeName { get; } = configTypeName;
 
         public bool Equals(EntityConfigMapping? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return EntityTypeName == other.EntityTypeName &&
-                   ConfigTypeName == other.ConfigTypeName;
+            return EntityTypeName == other.EntityTypeName
+                   && ConfigTypeName == other.ConfigTypeName;
         }
 
-        public override bool Equals(object? obj) =>
-            Equals(obj as EntityConfigMapping);
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as EntityConfigMapping);
+        }
 
-        public override int GetHashCode() =>
-           (EntityTypeName, ConfigTypeName).GetHashCode();
+        public override int GetHashCode()
+        {
+            return (EntityTypeName, ConfigTypeName).GetHashCode();
+        }
 
         public static bool operator ==(EntityConfigMapping? left, EntityConfigMapping? right) =>
             Equals(left, right);

@@ -96,3 +96,6 @@ coverage*.html
 Thumbs.db
 ehthumbs.db
 desktop.ini
+/WebAPI/AuthAPI/Data/auth.db
+/WebAPI/AuthAPI/Data/auth.db-shm
+/WebAPI/AuthAPI/Data/auth.db-wal

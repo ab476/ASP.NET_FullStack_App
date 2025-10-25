@@ -1,13 +1,18 @@
-﻿using EFCore.NamingConventions.Internal;
+﻿using AuthAPI.Data.Role;
+using AuthAPI.Data.RoleClaim;
+using AuthAPI.Data.User;
+using AuthAPI.Data.UserAddress;
+using AuthAPI.Data.UserClaim;
+using AuthAPI.Data.UserLogin;
+using AuthAPI.Data.UserRole;
+using EFCore.NamingConventions.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.Extensions.Options;
-using System.Globalization;
 
 namespace AuthAPI.Data;
 
 
-public class AuthDbContext(DbContextOptions<AuthDbContext> options, IOptions<DatabaseOptions> dbConfig)
+public class AuthDbContext(DbContextOptions<AuthDbContext> options, INameRewriter nameRewriter, IEntityConfigurationAggregator aggregator)
         : IdentityDbContext<
         TUser,
         TRole,
@@ -27,8 +32,6 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options, IOptions<Dat
     public DbSet<TUserToken> TUserTokens => base.UserTokens;
     public DbSet<TUserAddress> TUserAddresses { get; set; }
 
-    private readonly DatabaseOptions _DBConfig = dbConfig.Value;
-    private DatabaseType ActiveDatabase => _DBConfig.ActiveDatabase;
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         base.ConfigureConventions(configurationBuilder);
@@ -39,13 +42,8 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options, IOptions<Dat
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
-        var nameRewriter = ActiveDatabase is DatabaseType.Oracle 
-            ? new UpperSnakeCaseNameRewriter(CultureInfo.CurrentCulture)
-            : new SnakeCaseNameRewriter(CultureInfo.CurrentCulture);
 
-        var extensions = new TableConfigurations.EntityConfigurationAggregator();
-        extensions.ApplyAutoConfigurations(modelBuilder, nameRewriter);
+        aggregator.ApplyAutoConfigurations(modelBuilder, nameRewriter);
         
     }
 }

@@ -1,4 +1,11 @@
-﻿using Common.Generators;
+﻿using AuthAPI.Data.Role;
+using AuthAPI.Data.RoleClaim;
+using AuthAPI.Data.User;
+using AuthAPI.Data.UserAddress;
+using AuthAPI.Data.UserClaim;
+using AuthAPI.Data.UserLogin;
+using AuthAPI.Data.UserRole;
+using Common.Generators;
 
 namespace AuthAPI.Data.TableConfigurations;
 [ApplyEntityConfiguration(typeof(TUser), typeof(TUserConfiguration))]
@@ -9,6 +16,7 @@ namespace AuthAPI.Data.TableConfigurations;
 [ApplyEntityConfiguration(typeof(TRoleClaim), typeof(TRoleClaimConfiguration))]
 [ApplyEntityConfiguration(typeof(TUserToken), typeof(TUserTokenConfiguration))]
 [ApplyEntityConfiguration(typeof(TUserAddress), typeof(TUserAddressConfiguration))]
-public partial class EntityConfigurationAggregator
+public partial class EntityConfigurationAggregator : IEntityConfigurationAggregator
 {
+    
 }

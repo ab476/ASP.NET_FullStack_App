@@ -1,4 +1,6 @@
-﻿namespace AuthAPI.Data.Tables;
+﻿using AuthAPI.Data.UserAddress;
+
+namespace AuthAPI.Data.User;
 
 public class TUser : IdentityUser<Guid>
 {
@@ -8,10 +10,9 @@ public class TUser : IdentityUser<Guid>
 
     public DateTime? DateOfBirth { get; set; }
     public DateTime? LastLogin { get; set; }
-    public bool IsActive { get; set; } = true;
     //Audit Columns
     public DateTime? CreatedOn { get; set; } = DateTime.UtcNow;
     public DateTime? ModifiedOn { get; set; }
     // Navigation property for one-to-many relationsip
-    public virtual List<TUserAddress> Addresses { get; set; } = [];
+    public virtual ICollection<TUserAddress> Addresses { get; set; } = [];
 }

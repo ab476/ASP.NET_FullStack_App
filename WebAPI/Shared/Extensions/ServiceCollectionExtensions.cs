@@ -1,20 +1,27 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Common.Extensions;
-public static partial class ServiceCollectionExtensions
+public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection ConfigureOptionsFromSection<T>(this IServiceCollection services)
-            where T : class, new()
+    public static IServiceCollection AddOptionsFromConfiguration<T>(this IServiceCollection services)
+        where T : class, new()
     {
-        services.AddSingleton(static resolver =>
+        return services.AddOptionsFromConfiguration<T>(typeof(T).Name);
+    }
+
+    public static IServiceCollection AddOptionsFromConfiguration<T>(this IServiceCollection services, string sectionName)
+        where T : class, new()
+    {
+        if (string.IsNullOrWhiteSpace(sectionName))
+            throw new ArgumentException("Section name cannot be null or empty.", nameof(sectionName));
+
+        services.AddSingleton(resolver =>
         {
-            string sectionName = typeof(T).Name;
             var configuration = resolver.GetRequiredService<IConfiguration>();
             var options = new T();
             configuration.GetSection(sectionName).Bind(options);
-            return Options.Create(options);
+            return options;
         });
 
         return services;

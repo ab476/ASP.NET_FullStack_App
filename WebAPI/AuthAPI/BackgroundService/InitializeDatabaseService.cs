@@ -1,6 +1,8 @@
 ﻿namespace AuthAPI.BackgroundService;
 
 using AuthAPI.Data;
+using AuthAPI.Data.Role;
+using AuthAPI.Data.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -18,7 +20,7 @@ public class InitializeDatabaseService(
     private const string AdminEmail = "admin@example.com";
     private const string MemberEmail = "member@example.com";
     private const string AdminRole = "Admin";
-    private const string DefaultPassword = "password";
+    private const string DefaultPassword = "password@#3";
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -49,7 +51,7 @@ public class InitializeDatabaseService(
     private async Task EnsureDatabaseCreatedAsync(AuthDbContext dbContext, CancellationToken ct)
     {
         _logger.LogInformation("Ensuring database is created...");
-        await dbContext.Database.EnsureDeletedAsync(ct);
+        //await dbContext.Database.EnsureDeletedAsync(ct);
         await dbContext.Database.EnsureCreatedAsync(ct);
     }
 

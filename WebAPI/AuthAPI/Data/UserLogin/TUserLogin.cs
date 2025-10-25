@@ -1,4 +1,4 @@
-﻿namespace AuthAPI.Data.Tables;
+﻿namespace AuthAPI.Data.UserLogin;
 
 public class TUserLogin : IdentityUserLogin<Guid>
 {

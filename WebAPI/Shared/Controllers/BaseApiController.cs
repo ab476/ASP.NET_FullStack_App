@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Common.Controllers;
 
@@ -9,9 +11,9 @@ public abstract class BaseApiController : ControllerBase
     {
         return new OkApiResult();
     }
-    public override OkObjectResult Ok(object value)
+    public Ok<ApiResponse<T>> Ok<T>(T value)
     {
-        return base.Ok(new ApiResponse<object>(true, value));
+        return TypedResults.Ok(new ApiResponse<T>(true, value));
     }
     public override BadRequestResult BadRequest()
     {

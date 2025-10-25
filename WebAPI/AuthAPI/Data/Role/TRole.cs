@@ -1,4 +1,4 @@
-﻿namespace AuthAPI.Data.Tables;
+﻿namespace AuthAPI.Data.Role;
 
 public class TRole : IdentityRole<Guid>
 {

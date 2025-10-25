@@ -3,5 +3,6 @@
 public record ApiResponse<T>(
     bool Success,
     T? Data = default!,
-    string Message = ""
+    string Message = "",
+    HttpStatusCode? StatusCode = null
 );

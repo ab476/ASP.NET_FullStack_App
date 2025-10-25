@@ -1,13 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Options;
 
 namespace AuthAPI.Data;
 
-public class AuthDbContextFactory(IOptions<DatabaseOptions> options)
+public class AuthDbContextFactory(MultiDatabaseConfig _dbOptions)
 {
-
-    private readonly DatabaseOptions _dbOptions = options.Value;
 
     public void Configure(DbContextOptionsBuilder options)
     {

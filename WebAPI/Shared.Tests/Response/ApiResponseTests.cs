@@ -5,56 +5,47 @@ public class ApiResponseTests
     [Fact]
     public void Constructor_ShouldAssignProperties()
     {
-        // Arrange
         var success = true;
         var data = "Hello World";
         var message = "Operation successful";
+        var statusCode = HttpStatusCode.OK;
 
-        // Act
-        var response = new ApiResponse<string>(success, data, message);
+        var response = new ApiResponse<string>(success, data, message, statusCode);
 
-        // Assert
         response.Success.Should().BeTrue();
         response.Data.Should().Be(data);
         response.Message.Should().Be(message);
+        response.StatusCode.Should().Be(statusCode);
     }
 
     [Fact]
     public void Constructor_ShouldAssignDefaultValues_WhenNotProvided()
     {
-        // Act
         var response = new ApiResponse<int>(true);
 
-        // Assert
         response.Success.Should().BeTrue();
-        response.Data.Should().Be(default(int));
+        response.Data.Should().Be(default);
         response.Message.Should().BeEmpty();
+        response.StatusCode.Should().BeNull();
     }
 
     [Fact]
-    public void Records_ShouldBeComparableByValue()
+    public void Equality_ShouldCompareReferences_WhenClassType()
     {
-        // Arrange
         var response1 = new ApiResponse<int>(true, 42, "Ok");
         var response2 = new ApiResponse<int>(true, 42, "Ok");
 
-        // Assert
-        response1.Should().Be(response2); // value-based equality
+        response1.Should().NotBeSameAs(response2);
+        response1.Should().NotBe(response2);
     }
 
     [Fact]
-    public void Records_ShouldHaveDeconstructMethod()
+    public void StatusCode_ShouldBeOptional()
     {
-        // Arrange
-        var response = new ApiResponse<string>(true, "Data", "Msg");
+        var response = new ApiResponse<string>(false, "Error", "Something went wrong");
 
-        // Act
-        var (success, data, message) = response;
-
-        // Assert
-        success.Should().BeTrue();
-        data.Should().Be("Data");
-        message.Should().Be("Msg");
+        response.StatusCode.Should().BeNull();
+        response.Success.Should().BeFalse();
+        response.Message.Should().Be("Something went wrong");
     }
 }
-

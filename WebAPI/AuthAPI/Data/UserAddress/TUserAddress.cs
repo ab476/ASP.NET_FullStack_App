@@ -1,4 +1,6 @@
-﻿namespace AuthAPI.Data.Tables;
+﻿using AuthAPI.Data.User;
+
+namespace AuthAPI.Data.UserAddress;
 
 public class TUserAddress
 {
@@ -13,6 +15,6 @@ public class TUserAddress
     public bool IsActive { get; set; }
 
     //Audit Columns
-    public DateTime? CreatedOn { get; set; }
+    public DateTime CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }
 }

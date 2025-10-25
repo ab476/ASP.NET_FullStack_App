@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Common.Generators;
 
@@ -22,8 +23,8 @@ public class EntityConfigurationGenerator : IIncrementalGenerator
     {
         var classDeclarations = generatorContext.SyntaxProvider
             .CreateSyntaxProvider(
-                predicate: static (s, _) => HasRelevantAttributes(s),
-                transform: static (ctx, _) => ExtractTargetClassInfo(ctx)
+                predicate: HasRelevantAttributes,
+                transform: ExtractTargetClassInfo
             )
             .Where(static m => m is not null);
 
@@ -118,6 +119,7 @@ public class EntityConfigurationGenerator : IIncrementalGenerator
 
 
     private const string ApplyEntityConfigurationAttribute = "ApplyEntityConfigurationAttribute";
+    private const string ApplyEntityConfigurationAttributeFullName = $"Common.Generators.{ApplyEntityConfigurationAttribute}";
 
     /// <summary>
     /// Emits the <c>ApplyEntityConfigurationAttribute</c> attribute definition,
@@ -126,7 +128,7 @@ public class EntityConfigurationGenerator : IIncrementalGenerator
     private static void GenerateSupportingTypes(IncrementalGeneratorPostInitializationContext context)
     {
         context.AddSource(
-            hintName: $"Common.Generators.{ApplyEntityConfigurationAttribute}.g.cs",
+            hintName: $"{ApplyEntityConfigurationAttributeFullName}.g.cs",
             source: $$"""
             namespace Common.Generators
             {
@@ -158,7 +160,7 @@ public class EntityConfigurationGenerator : IIncrementalGenerator
     /// Extracts semantic information from a class declaration if it has the
     /// <c>ApplyEntityConfigurationAttribute</c> applied.
     /// </summary>
-    private static TargetClassInfo? ExtractTargetClassInfo(GeneratorSyntaxContext context)
+    private static TargetClassInfo? ExtractTargetClassInfo(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
         if (context.Node is not ClassDeclarationSyntax classDeclarationSyntax)
             return null;
@@ -166,30 +168,37 @@ public class EntityConfigurationGenerator : IIncrementalGenerator
         if (context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax) is not INamedTypeSymbol classSymbol)
             return null;
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         var attributeSymbol = context.SemanticModel.Compilation
-            .GetTypeByMetadataName($"Common.Generators.{ApplyEntityConfigurationAttribute}");
+            .GetTypeByMetadataName(ApplyEntityConfigurationAttributeFullName);
 
         if (attributeSymbol is null)
             return null;
 
-        var configurationMappings = classSymbol.GetAttributes()
-            .Where(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, attributeSymbol))
-            .Select(attr =>
-            {
-                var entityType = attr.ConstructorArguments.ElementAtOrDefault(0).Value as INamedTypeSymbol;
-                var configType = attr.ConstructorArguments.ElementAtOrDefault(1).Value as INamedTypeSymbol;
+        cancellationToken.ThrowIfCancellationRequested();
 
-                if (entityType == null || configType == null)
-                    return null;
+        var configurationMappings = new List<TargetClassInfo.EntityConfigMapping>();
 
-                return new TargetClassInfo.EntityConfigMapping(
+        foreach (var attr in classSymbol.GetAttributes())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (!SymbolEqualityComparer.Default.Equals(attr.AttributeClass, attributeSymbol))
+                continue;
+
+
+            if (attr.ConstructorArguments.ElementAtOrDefault(0).Value is not INamedTypeSymbol entityType
+                || attr.ConstructorArguments.ElementAtOrDefault(1).Value is not INamedTypeSymbol configType)
+                continue;
+
+            configurationMappings.Add(
+                new TargetClassInfo.EntityConfigMapping(
                     entityType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     configType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-                );
-            })
-            .Where(x => x is not null)
-            .Select(x => x!)
-            .ToList();
+                )
+            );
+        }
 
         if (configurationMappings.Count == 0)
             return null;
@@ -204,8 +213,10 @@ public class EntityConfigurationGenerator : IIncrementalGenerator
     /// <summary>
     /// Checks whether the given syntax node has attributes, making it a candidate for inspection.
     /// </summary>
-    private static bool HasRelevantAttributes(SyntaxNode syntaxNode)
+    private static bool HasRelevantAttributes(SyntaxNode syntaxNode, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         return syntaxNode is ClassDeclarationSyntax classDeclarationSyntax
             && classDeclarationSyntax.AttributeLists.Count > 0;
     }

@@ -1,4 +1,6 @@
-﻿namespace AuthAPI.Services.IServices;
+﻿using AuthAPI.Features.Users;
+
+namespace AuthAPI.Services.IServices;
 
 public interface IAccountService
 {

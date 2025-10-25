@@ -19,7 +19,7 @@ public class ApiActionResultTests
         result.Response!.Success.Should().BeTrue();
         result.Response.Data.Should().Be(value);
         result.Response.Message.Should().Be(message);
-        result.Result.Should().BeNull();
+        result.ActionResult.Should().BeNull();
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class ApiActionResultTests
 
         // Assert
         result.Response.Should().BeSameAs(apiResponse);
-        result.Result.Should().BeNull();
+        result.ActionResult.Should().BeNull();
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class ApiActionResultTests
         var result = new ApiActionResult<string>(actionResult);
 
         // Assert
-        result.Result.Should().BeSameAs(actionResult);
+        result.ActionResult.Should().BeSameAs(actionResult);
         result.Response.Should().BeNull();
     }
 
