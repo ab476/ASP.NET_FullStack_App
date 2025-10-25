@@ -1,5 +1,12 @@
 ﻿namespace Common.Configurations;
-public class MultiDatabaseConfig
+
+public interface IMultiDatabaseConfig
+{
+    DatabaseType ActiveDatabase { get; set; }
+    Dictionary<string, string> ConnectionStrings { get; set; }
+}
+
+public class MultiDatabaseConfig : IMultiDatabaseConfig
 {
     public DatabaseType ActiveDatabase { get; set; }
     public Dictionary<string, string> ConnectionStrings { get; set; } = [];
@@ -7,7 +14,7 @@ public class MultiDatabaseConfig
 
 public static partial class DatabaseOptionsExtensions
 {
-    public static string GetActiveConnectionString(this MultiDatabaseConfig databaseOptions)
+    public static string GetActiveConnectionString(this IMultiDatabaseConfig databaseOptions)
     {
         var activeDbKey = databaseOptions.ActiveDatabase.ToString();
         databaseOptions.ConnectionStrings.TryGetValue(activeDbKey, out string? connectionString);

@@ -23,8 +23,8 @@ services.AddSwaggerGen(options =>
     options.OperationAsyncFilter<ApiActionResultOperationFilter>();
 });
 services.AddHttpClient();
-services.AddOptionsFromConfiguration<MultiDatabaseConfig>();
-services.AddOptionsFromConfiguration<EmailSettings>();
+services.AddOptionsFromConfiguration<IMultiDatabaseConfig, MultiDatabaseConfig>("MultiDatabaseConfig");
+services.AddOptionsFromConfiguration<IEmailSettings, EmailSettings>("EmailSettings");
 builder.Services.AddSingleton<INameRewriter>(provider =>
 {
     var culture = CultureInfo.CurrentCulture;
