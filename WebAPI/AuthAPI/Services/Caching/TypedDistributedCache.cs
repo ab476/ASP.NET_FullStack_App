@@ -13,7 +13,7 @@ public class TypedDistributedCache<TService>(
     private readonly IDistributedCache _cache = cache;
     private readonly ILogger<TypedDistributedCache<TService>> _logger = logger;
 
-    private readonly string _keyPrefix = $"{typeof(TService).FullName}_";
+    private readonly string _FullName = typeof(TService).FullName!;
 
     public async Task<(bool Found, TValue? Value)> TryGetValueAsync<TValue>(string key)
     {
@@ -46,9 +46,9 @@ public class TypedDistributedCache<TService>(
     public Task RemoveAsync(string key) =>
         _cache.RemoveAsync(BuildKey(key));
 
-    private string BuildKey(string key) => $"{_keyPrefix}{key}";
+    private string BuildKey(string key) => $"{_FullName}_{key}";
 
-    private static byte[] Serialize<TValue>(TValue item)
+    private byte[] Serialize<TValue>(TValue item)
     {
         try
         {
@@ -57,7 +57,7 @@ public class TypedDistributedCache<TService>(
         catch (Exception ex)
         {
             throw new InvalidOperationException(
-                $"MemoryPack serialization failed for '{typeof(TValue).FullName}'.", ex);
+                $"MemoryPack serialization failed for '{_FullName}'.", ex);
         }
     }
 
@@ -71,7 +71,7 @@ public class TypedDistributedCache<TService>(
         {
             _logger.LogError(ex,
                 "MemoryPack deserialization failed for type {Type}.",
-                typeof(TValue).FullName);
+                _FullName);
             return default;
         }
     }

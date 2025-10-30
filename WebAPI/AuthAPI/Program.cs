@@ -4,6 +4,7 @@ using AuthAPI.Data.Role;
 using AuthAPI.Data.TableConfigurations;
 using AuthAPI.Data.User;
 using AuthAPI.Models.Validators;
+using AuthAPI.Services.SqlSchema;
 using AuthAPI.Services.Time;
 using Common.Swagger;
 using EFCore.NamingConventions.Internal;
@@ -49,7 +50,8 @@ builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 builder.Services.AddControllers();
 
-services.AddTimeProvider();
+services.AddTimeProvider()
+    .AddSchemaService();
 
 builder.Services.AddHostedService<InitializeDatabaseService>();
 
@@ -65,7 +67,7 @@ if (env.IsDevelopment())
     });
 }
 
-
+app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
