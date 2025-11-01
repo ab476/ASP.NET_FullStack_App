@@ -64,7 +64,7 @@ public partial class SqlSchemaParserService : ISqlSchemaParser
 
     private static void ExtractConstraints(string line, List<string> primaryKeys, List<SqlForeignKey> foreignKeys)
     {
-        var pkMatch = PrimarryKeyRegex().Match(line);
+        var pkMatch = PrimaryKeyRegex().Match(line);
         if (pkMatch.Success)
         {
             var pkColumns = SqlIdentifierRegex().Matches(pkMatch.Groups[1].Value)
@@ -104,7 +104,7 @@ public partial class SqlSchemaParserService : ISqlSchemaParser
     [GeneratedRegex(@"\[(?<name>[^\]]+)\]\s+(?<type>[^\s,]+)(?:.*?(?<null>NULL|NOT NULL))?", RegexOptions.IgnoreCase, "en-US")]
     private static partial Regex ColumnRegex();
     [GeneratedRegex(@"PRIMARY KEY\s*\((.*?)\)", RegexOptions.IgnoreCase, "en-US")]
-    private static partial Regex PrimarryKeyRegex();
+    private static partial Regex PrimaryKeyRegex();
     [GeneratedRegex(@"\[(.*?)\]")]
     private static partial Regex SqlIdentifierRegex();
     [GeneratedRegex(@"FOREIGN KEY\s*\(\[([^\]]+)\]\)\s+REFERENCES\s+\[([^\]]+)\]\s+\(\[([^\]]+)\]\)", RegexOptions.IgnoreCase, "en-US")]
