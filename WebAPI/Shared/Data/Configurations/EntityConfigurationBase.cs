@@ -1,5 +1,4 @@
 ﻿using EFCore.NamingConventions.Internal;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Common.Data.Configurations;

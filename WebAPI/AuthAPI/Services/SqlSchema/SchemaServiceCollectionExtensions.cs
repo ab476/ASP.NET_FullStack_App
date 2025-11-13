@@ -1,5 +1,4 @@
-﻿using AuthAPI.Services.Caching;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AuthAPI.Services.SqlSchema;
 

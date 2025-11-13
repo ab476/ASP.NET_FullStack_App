@@ -20,7 +20,7 @@ public class InitializeDatabaseService(
     private const string AdminEmail = "admin@example.com";
     private const string MemberEmail = "member@example.com";
     private const string AdminRole = "Admin";
-    private const string DefaultPassword = "password@#3";
+    private const string DefaultPassword = "passWord@#3";
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {

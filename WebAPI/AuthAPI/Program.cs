@@ -3,12 +3,16 @@ using AuthAPI.Data;
 using AuthAPI.Data.Role;
 using AuthAPI.Data.TableConfigurations;
 using AuthAPI.Data.User;
+using AuthAPI.Endpoints;
 using AuthAPI.Models.Validators;
 using AuthAPI.Services.SqlSchema;
 using AuthAPI.Services.Time;
 using Common.Swagger;
 using EFCore.NamingConventions.Internal;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +57,27 @@ builder.Services.AddControllers();
 services.AddTimeProvider()
     .AddSchemaService();
 
+// Add Authentication & JWT
+services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var jwt = builder.Configuration.GetSection("Jwt");
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwt["Issuer"],
+        ValidAudience = jwt["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!))
+    };
+});
+
 builder.Services.AddHostedService<InitializeDatabaseService>();
 
 var app = builder.Build();
@@ -68,7 +93,10 @@ if (env.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
+app.MapKeyGenEndpoints();
 
 app.Run();
 

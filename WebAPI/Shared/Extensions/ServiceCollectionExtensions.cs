@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Common.Extensions;
+﻿namespace Common.Extensions;
 
 
 public static class ServiceCollectionExtensions

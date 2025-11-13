@@ -40,6 +40,11 @@ public class DevController(AuthDbContext _context, IMultiDatabaseConfig _databas
 
         return File(stream, "text/csv", Path.GetFileName(FilePath));
     }
+    [HttpGet("{id:int}")]
+    public  Task Test([FromQuery] DevInfo devInfo)
+    {
+        return Task.CompletedTask;
+    }
 }
 
-public record DevInfo(string Application, string Environment, string Version);
+public record DevInfo(string Application, string Environment, string Version, [FromRoute] int id);

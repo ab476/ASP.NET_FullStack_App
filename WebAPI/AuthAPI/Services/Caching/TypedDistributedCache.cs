@@ -1,6 +1,5 @@
 ﻿using MemoryPack;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Logging;
 
 namespace AuthAPI.Services.Caching;
 

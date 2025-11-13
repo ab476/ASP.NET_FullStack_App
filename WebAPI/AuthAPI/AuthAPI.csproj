@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="EFCore.NamingConventions" Version="8.0.0" />
     <PackageReference Include="MemoryPack" Version="1.21.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
