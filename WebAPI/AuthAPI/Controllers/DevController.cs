@@ -1,6 +1,4 @@
 ﻿using AuthAPI.Data;
-using Common.Controllers;
-using Common.Response;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AuthAPI.Controllers;
 
 [Route("api/dev")]
-public class DevController(AuthDbContext _context, IMultiDatabaseConfig _databaseConfig) : BaseApiController
+public class DevController(AuthDbContext _context, IMultiDatabaseConfig _databaseConfig) : ControllerBase
 {
     [HttpGet("download-schema")]
     public FileResult DownloadSchema()
@@ -25,26 +23,4 @@ public class DevController(AuthDbContext _context, IMultiDatabaseConfig _databas
 
         return File(fileContent, MediaTypeNames.Text.Plain, schemaFileName);
     }
-
-    [HttpGet]
-    public ActionResult<ApiResponse<DevInfo>> Get([FromQuery] DevInfo devInfo)
-    {
-        return new ApiResponse<DevInfo>(true, devInfo);
-    }
-    private const string FilePath = "C:\\Users\\ariji\\Downloads\\permutations_0-5.csv";
-
-    [HttpGet("GetFile")]
-    public FileStreamResult Get()
-    {
-        var stream = new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-        return File(stream, "text/csv", Path.GetFileName(FilePath));
-    }
-    [HttpGet("{id:int}")]
-    public  Task Test([FromQuery] DevInfo devInfo)
-    {
-        return Task.CompletedTask;
-    }
 }
-
-public record DevInfo(string Application, string Environment, string Version, [FromRoute] int id);

@@ -5,12 +5,6 @@ public class ConfigurationDbContext(DbContextOptions<ConfigurationDbContext> opt
 {
     public DbSet<TConfigurationEntry> TConfigurations { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-
-        optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -25,7 +19,7 @@ public class ConfigurationDbContext(DbContextOptions<ConfigurationDbContext> opt
 
             b.Property(e => e.Value)
                 .IsRequired()
-                .HasMaxLength(500);   // performance-friendly, in-row storage
+                .HasMaxLength(500);
 
             b.Property(e => e.LastUpdated)
                 .IsRequired();

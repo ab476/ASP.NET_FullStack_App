@@ -1,0 +1,27 @@
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using System.Net.Mime;
+
+namespace Common.Features.DatabaseConfiguration.Endpoints;
+public static class DatabaseConfigurationEndpointExtensions
+{
+    public static IEndpointRouteBuilder MapDatabaseConfigurationScript(
+        this IEndpointRouteBuilder endpoints,
+        string route)
+    {
+        endpoints.MapGet(route, async (IDbContextFactory<ConfigurationDbContext> _dbFactory) =>
+        {
+            using var db = await _dbFactory.CreateDbContextAsync();
+            var script = db.Database.GenerateCreateScript();
+
+            return Results.Text(script, MediaTypeNames.Text.Plain);
+        })
+        .WithName("GetConfigurationDbScript")
+        .WithSummary("Returns CREATE TABLE DDL for config system")
+        .WithTags("Database Configuration")
+        .WithOpenApi();
+
+        return endpoints;
+    }
+}

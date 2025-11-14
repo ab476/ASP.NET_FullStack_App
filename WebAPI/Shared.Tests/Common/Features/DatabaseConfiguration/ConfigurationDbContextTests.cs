@@ -58,8 +58,11 @@ public class ConfigurationDbContextTests : IAsyncLifetime
         using var ctx = CreateContext();
 
         var entity = ctx.Model.FindEntityType(typeof(TConfigurationEntry));
+
+        entity.Should().NotBeNull();
         var pk = entity.FindPrimaryKey();
 
+        pk.Should().NotBeNull();
         pk.Properties.Should().ContainSingle()
             .Which.Name.Should().Be("Key");
     }
@@ -69,8 +72,9 @@ public class ConfigurationDbContextTests : IAsyncLifetime
     {
         using var ctx = CreateContext();
 
-        var prop = ctx.Model.FindEntityType(typeof(TConfigurationEntry)).FindProperty("Key");
+        var prop = ctx.Model.FindEntityType(typeof(TConfigurationEntry))?.FindProperty("Key");
 
+        prop.Should().NotBeNull();
         prop.GetMaxLength().Should().Be(256);
         prop.IsNullable.Should().BeFalse();
     }
@@ -80,8 +84,9 @@ public class ConfigurationDbContextTests : IAsyncLifetime
     {
         using var ctx = CreateContext();
 
-        var prop = ctx.Model.FindEntityType(typeof(TConfigurationEntry)).FindProperty("Value");
+        var prop = ctx.Model.FindEntityType(typeof(TConfigurationEntry))?.FindProperty("Value");
 
+        prop.Should().NotBeNull();
         prop.GetMaxLength().Should().Be(500);
         prop.IsNullable.Should().BeFalse();
     }
@@ -93,6 +98,7 @@ public class ConfigurationDbContextTests : IAsyncLifetime
 
         var entity = ctx.Model.FindEntityType(typeof(TConfigurationEntry));
 
+        entity.Should().NotBeNull();
         var index = entity.GetIndexes()
             .FirstOrDefault(i => i.Properties.Any(p => p.Name == "LastUpdated"));
 
@@ -106,9 +112,10 @@ public class ConfigurationDbContextTests : IAsyncLifetime
 
         var entity = ctx.Model.FindEntityType(typeof(TConfigurationEntry));
 
+        entity.Should().NotBeNull();
         var index = entity.GetIndexes()
             .First(i => i.Properties.Any(p => p.Name == "LastUpdated"));
 
-        index.GetDatabaseName().Should().Be("snake_IX_Config_LastUpdated");
+        index.GetDatabaseName().Should().Be("IX_Config_LastUpdated");
     }
 }

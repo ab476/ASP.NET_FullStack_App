@@ -2,45 +2,33 @@
 
 namespace Common.Features.DatabaseConfiguration.Provider;
 
-public sealed class DatabaseConfigurationHostedService : BackgroundService
+public sealed class DatabaseConfigurationHostedService(
+    DatabaseConfigurationProvider provider,
+    IConfigRefreshInterval intervalProvider,
+    ILogger<DatabaseConfigurationHostedService> logger) : BackgroundService
 {
-    private readonly DatabaseConfigurationProvider _provider;
-    private readonly IConfigRefreshInterval _intervalProvider;
-    private readonly ILogger<DatabaseConfigurationHostedService> _logger;
-    private readonly TimeSpan _maxJitter; // optional jitter cap
-
-    public DatabaseConfigurationHostedService(
-        DatabaseConfigurationProvider provider,
-        IConfigRefreshInterval intervalProvider,
-        ILogger<DatabaseConfigurationHostedService> logger,
-        TimeSpan? maxJitter = null)
-    {
-        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-        _intervalProvider = intervalProvider ?? throw new ArgumentNullException(nameof(intervalProvider));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _maxJitter = maxJitter ?? TimeSpan.FromSeconds(5); // default small jitter
-    }
+    private readonly TimeSpan _maxJitter = TimeSpan.FromSeconds(5); // optional jitter cap
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("DatabaseConfigurationHostedService starting.");
+        logger.LogInformation("DatabaseConfigurationHostedService starting.");
 
         // Initial load
         try
         {
-            _provider.Load();
-            _logger.LogInformation("Initial configuration load completed.");
+            provider.Load();
+            logger.LogInformation("Initial configuration load completed.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Initial configuration load failed.");
+            logger.LogError(ex, "Initial configuration load failed.");
         }
 
         // Cache interval locally unless you expect it to change dynamically.
-        var interval = _intervalProvider.Value;
+        var interval = intervalProvider.Value;
         if (interval <= TimeSpan.Zero)
         {
-            _logger.LogWarning("Configured interval is zero or negative — polling disabled.");
+            logger.LogWarning("Configured interval is zero or negative — polling disabled.");
             return;
         }
 
@@ -50,16 +38,15 @@ public sealed class DatabaseConfigurationHostedService : BackgroundService
         {
             try
             {
-                await _provider.CheckAndReloadIfNeededAsync(stoppingToken).ConfigureAwait(false);
+                await provider.CheckAndReloadIfNeededAsync(stoppingToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
-                // graceful shutdown
                 break;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while checking for DB configuration updates.");
+                logger.LogError(ex, "Error while checking for DB configuration updates.");
             }
 
             // add jitter to reduce thundering herd in multi-instance deployments
@@ -76,6 +63,6 @@ public sealed class DatabaseConfigurationHostedService : BackgroundService
             }
         }
 
-        _logger.LogInformation("DatabaseConfigurationHostedService stopping.");
+        logger.LogInformation("DatabaseConfigurationHostedService stopping.");
     }
 }

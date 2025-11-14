@@ -2,9 +2,14 @@
 
 public class DatabaseConfigurationOptions
 {
-    public TimeSpan PollInterval { get; set; } = TimeSpan.FromSeconds(30);
-    public bool EnablePooling { get; set; } = true;
+    public TimeSpan PollInterval { get; set; }
+    public bool EnablePooling { get; set; }
 
     // Hook for additional DbContext options:
     public Action<DbContextOptionsBuilder>? ConfigureDbContext { get; set; }
+
+    public bool MapDbScriptRoute { get; set; }
+
+    public const string DefaultDbScriptRoute = "/config/db-script";
+    public string? DbScriptRoute { get; set; }
 }

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.Text;
+using Common.Features.DatabaseConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,9 @@ builder.Services.AddControllers();
 
 services.AddTimeProvider()
     .AddSchemaService();
+
+builder.Configuration
+    .AddDatabaseConfiguration(services);
 
 // Add Authentication & JWT
 services.AddAuthentication(options =>
