@@ -1,4 +1,4 @@
-﻿namespace AuthAPI.Services.Time;
+﻿namespace Common.Services.Time;
 
 public interface ITimeProvider
 {

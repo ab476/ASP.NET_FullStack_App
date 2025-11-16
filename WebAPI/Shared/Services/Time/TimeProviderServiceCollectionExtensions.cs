@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Common.Services.Time;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AuthAPI.Services.Time;
 

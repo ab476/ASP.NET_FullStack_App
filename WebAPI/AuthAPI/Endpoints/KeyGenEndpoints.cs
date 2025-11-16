@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 
 namespace AuthAPI.Endpoints;
 
@@ -16,7 +17,7 @@ public static class KeyGenEndpoints
         else
             group.RequireAuthorization(policy => policy.RequireRole("admin"));
 
-        group.MapGet("/", ([AsParameters] KeyGenRequest request) =>
+        group.MapGet("/", ([AsParameters] KeyGenRequest request, [FromServices] ITimeProvider timeProvider) =>
         {
             if (request.Size < 16 || request.Size > 256)
                 return Results.BadRequest("Key size must be between 16 and 256 bytes.");
@@ -28,7 +29,7 @@ public static class KeyGenEndpoints
                 key,
                 bytes = request.Size,
                 bits = request.Size * 8,
-                generatedAt = DateTime.UtcNow
+                generatedAt = timeProvider.UtcNow
             });
         })
         .WithSummary("Generates a secure Base64 key for JWT or encryption use.")

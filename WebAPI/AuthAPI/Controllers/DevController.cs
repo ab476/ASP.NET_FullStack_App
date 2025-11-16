@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AuthAPI.Controllers;
 
 [Route("api/dev")]
-public class DevController(AuthDbContext _context, IMultiDatabaseConfig _databaseConfig) : ControllerBase
+public class DevController(AuthDbContext _context, IMultiDatabaseConfig _databaseConfig, ITimeProvider timeProvider) : ControllerBase
 {
     [HttpGet("download-schema")]
     public FileResult DownloadSchema()
@@ -16,7 +16,7 @@ public class DevController(AuthDbContext _context, IMultiDatabaseConfig _databas
         var fileContent = System.Text.Encoding.UTF8.GetBytes(createScript);
 
         var dbName = _context.Database.GetDbConnection().Database;
-        var timestamp = DateTime.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
+        var timestamp = timeProvider.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
         var providerName = _databaseConfig.ActiveDatabase.ToString() ?? "unknown";
 
         var schemaFileName = $"{dbName}_{providerName}_schema_{timestamp}.sql";

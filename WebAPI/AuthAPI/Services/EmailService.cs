@@ -4,7 +4,7 @@ using System.Net.Mail;
 
 namespace AuthAPI.Services;
 
-public class EmailService(IOptions<EmailSettings> emailOptions) : IEmailService
+public class EmailService(IOptions<EmailSettings> emailOptions, ITimeProvider time) : IEmailService
 {
     private readonly EmailSettings _emailSettings = emailOptions.Value;
     public async Task SendRegistrationConfirmationEmailAsync(string toEmail, string firstName, string confirmationLink)
@@ -17,7 +17,7 @@ public class EmailService(IOptions<EmailSettings> emailOptions) : IEmailService
                 <p style='text-align:center;'>
                     <a href='{confirmationLink}' style='background:#0d6efd; color:#fff; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:bold;'>Confirm Your Email</a>
                 </p>
-                <p style='font-size:12px; color:#999; margin-top:30px;'>&copy; {DateTime.UtcNow.Year} Dot Net Tutorials. All rights reserved.</p>
+                <p style='font-size:12px; color:#999; margin-top:30px;'>&copy; {time.UtcNow.Year} Dot Net Tutorials. All rights reserved.</p>
                 </div>
             </body></html>";
 
@@ -34,7 +34,7 @@ public class EmailService(IOptions<EmailSettings> emailOptions) : IEmailService
                 <p style='text-align:center;'>
                     <a href='{loginLink}' style='background:#198754; color:#fff; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:bold;'>Login to Your Account</a>
                 </p>
-                <p style='font-size:12px; color:#999; margin-top:30px;'>&copy; {DateTime.UtcNow.Year} Dot Net Tutorials. All rights reserved.</p>
+                <p style='font-size:12px; color:#999; margin-top:30px;'>&copy; {time.UtcNow.Year} Dot Net Tutorials. All rights reserved.</p>
                 </div>
             </body></html>";
 
@@ -51,7 +51,7 @@ public class EmailService(IOptions<EmailSettings> emailOptions) : IEmailService
                 <p style='text-align:center;'>
                     <a href='{confirmationLink}' style='background:#0d6efd; color:#fff; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:bold;'>Confirm Your Email</a>
                 </p>
-                <p style='font-size:12px; color:#999; margin-top:30px;'>&copy; {DateTime.UtcNow.Year} Dot Net Tutorials. All rights reserved.</p>
+                <p style='font-size:12px; color:#999; margin-top:30px;'>&copy; {time.UtcNow.Year} Dot Net Tutorials. All rights reserved.</p>
                 </div>
             </body></html>";
 

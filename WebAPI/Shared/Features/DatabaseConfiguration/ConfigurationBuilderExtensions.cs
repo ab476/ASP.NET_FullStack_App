@@ -42,6 +42,15 @@ public static class ConfigurationBuilderExtensions
         {
             dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             options.ConfigureDbContext?.Invoke(dbOptions);
+
+            if(dbOptions.IsConfigured)
+            {
+                logger.LogInformation("DbContextOptions have been configured.");
+            }
+            else
+            {
+                logger.LogError("DbContextOptions have not been configured. Please ensure ConfigureDbContext is set in DatabaseConfigurationOptions.");
+            }
         });
         
 

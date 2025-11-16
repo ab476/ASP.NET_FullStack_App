@@ -11,7 +11,7 @@ public class TUser : IdentityUser<Guid>
     public DateTime? DateOfBirth { get; set; }
     public DateTime? LastLogin { get; set; }
     //Audit Columns
-    public DateTime? CreatedOn { get; set; } = DateTime.UtcNow;
+    public DateTime? CreatedOn { get; set; }
     public DateTime? ModifiedOn { get; set; }
     // Navigation property for one-to-many relationsip
     public virtual ICollection<TUserAddress> Addresses { get; set; } = [];

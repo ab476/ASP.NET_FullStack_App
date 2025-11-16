@@ -1,10 +1,8 @@
 ﻿using AuthAPI.Data.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace AuthAPI.Controllers;
 
@@ -13,7 +11,8 @@ namespace AuthAPI.Controllers;
 public class AuthController(
     UserManager<TUser> userManager,
     SignInManager<TUser> signInManager,
-    IConfiguration configuration
+    IConfiguration configuration,
+    ITimeProvider time
 ) : ControllerBase
 {
     [HttpPost("register")]
@@ -79,7 +78,7 @@ public class AuthController(
             issuer: configuration["Jwt:Issuer"],
             audience: configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(1),
+            expires: time.UtcNow.AddHours(1),
             signingCredentials: creds
         );
 
