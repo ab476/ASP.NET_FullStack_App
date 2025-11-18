@@ -13,3 +13,4 @@ global using Microsoft.Extensions.Logging;
 
 global using Common.Features.DatabaseConfiguration.Data;
 global using Common.Features.DatabaseConfiguration.Polling;
+global using Common.Features.NameHelper;

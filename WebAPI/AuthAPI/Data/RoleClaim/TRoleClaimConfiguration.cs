@@ -1,12 +1,12 @@
 ﻿using Common.Data.Configurations;
-using EFCore.NamingConventions.Internal;
+using Common.Features.NameHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.RoleClaim;
 
 
-public class TRoleClaimConfiguration(INameRewriter nameRewriter) : EntityConfigurationBase<TRoleClaim>(nameRewriter)
+public class TRoleClaimConfiguration(INameHelper nameRewriter) : EntityConfigurationBase<TRoleClaim>(nameRewriter)
 {
     public override void Configure(EntityTypeBuilder<TRoleClaim> builder)
     {

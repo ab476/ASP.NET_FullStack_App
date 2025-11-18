@@ -1,11 +1,11 @@
 ﻿using Common.Data.Configurations;
-using EFCore.NamingConventions.Internal;
+using Common.Features.NameHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.UserAddress;
 
-public class TUserAddressConfiguration(INameRewriter nameRewriter) : EntityConfigurationBase<TUserAddress>(nameRewriter)
+public class TUserAddressConfiguration(INameHelper nameRewriter) : EntityConfigurationBase<TUserAddress>(nameRewriter)
 {
     public override void Configure(EntityTypeBuilder<TUserAddress> builder)
     {

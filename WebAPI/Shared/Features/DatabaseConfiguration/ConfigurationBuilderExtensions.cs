@@ -1,8 +1,4 @@
-﻿using Common.Features.DatabaseConfiguration.Endpoints;
-using Common.Features.DatabaseConfiguration.Provider;
-using EFCore.NamingConventions.Internal;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Common.Features.DatabaseConfiguration.Provider;
 
 namespace Common.Features.DatabaseConfiguration;
 
@@ -11,13 +7,11 @@ public static class ConfigurationBuilderExtensions
     public static IConfigurationBuilder AddDatabaseConfiguration(
         this IConfigurationBuilder builder,
         IServiceCollection services,
-        Action<DatabaseConfigurationOptions>? configure = null)
+        Action<DatabaseConfigurationOptions> configure)
     {
         var tempProvider = services.BuildServiceProvider();
         var logger = tempProvider.GetRequiredService<ILoggerFactory>()
             .CreateLogger("DatabaseConfigurationSetup");
-
-        services.TryAddScoped<INameRewriter, SnakeCaseNameRewriter>();
 
         logger.LogInformation("Initializing database configuration module.");
 
@@ -25,10 +19,9 @@ public static class ConfigurationBuilderExtensions
         {
             PollInterval = TimeSpan.FromMinutes(5),
             EnablePooling = true,
-            MapDbScriptRoute = true,
             DbScriptRoute = DatabaseConfigurationOptions.DefaultDbScriptRoute
         };
-        configure?.Invoke(options);
+        configure.Invoke(options);
 
         logger.LogDebug("DatabaseConfigurationOptions prepared: PollInterval={Interval}, EnablePooling={Pooling}.",
             options.PollInterval,
@@ -77,14 +70,7 @@ public static class ConfigurationBuilderExtensions
         builder.Add(new DatabaseConfigurationSource(configProvider));
 
         logger.LogInformation("Database configuration setup completed successfully.");
-
-        if (options.MapDbScriptRoute)
-        {
-            var route = options.DbScriptRoute ?? DatabaseConfigurationOptions.DefaultDbScriptRoute;
-            logger.LogInformation("Mapping database script route at {Route}.", route);
-            var appBuilder = finalProvider.GetRequiredService<IEndpointRouteBuilder>();
-            appBuilder.MapDatabaseConfigurationScript(route);
-        }
+        
         return builder;
     }
 }

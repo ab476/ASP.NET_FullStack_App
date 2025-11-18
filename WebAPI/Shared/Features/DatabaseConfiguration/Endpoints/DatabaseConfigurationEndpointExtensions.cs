@@ -1,27 +1,28 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Common.Features.DatabaseConfiguration.Provider;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using System.Net.Mime;
 
-namespace Common.Features.DatabaseConfiguration.Endpoints;
+namespace Common.Features.DatabaseConfiguration;
 public static class DatabaseConfigurationEndpointExtensions
 {
-    public static IEndpointRouteBuilder MapDatabaseConfigurationScript(
-        this IEndpointRouteBuilder endpoints,
-        string route)
+    public static void MapDatabaseConfigurationEndpoints(this IEndpointRouteBuilder endpoints, DatabaseConfigurationOptions? options = null)
     {
-        endpoints.MapGet(route, async (IDbContextFactory<ConfigurationDbContext> _dbFactory) =>
-        {
-            using var db = await _dbFactory.CreateDbContextAsync();
-            var script = db.Database.GenerateCreateScript();
+            var route = options?.DbScriptRoute ?? DatabaseConfigurationOptions.DefaultDbScriptRoute;
 
-            return Results.Text(script, MediaTypeNames.Text.Plain);
-        })
-        .WithName("GetConfigurationDbScript")
-        .WithSummary("Returns CREATE TABLE DDL for config system")
-        .WithTags("Database Configuration")
-        .WithOpenApi();
+            endpoints
+                .MapGet(route, async (IDbContextFactory<ConfigurationDbContext> _dbFactory) =>
+                {
+                    using var db = await _dbFactory.CreateDbContextAsync();
+                    var script = db.Database.GenerateCreateScript();
 
-        return endpoints;
+                    return Results.Text(script, MediaTypeNames.Text.Plain);
+                })
+                .WithName("GetConfigurationDbScript")
+                .WithSummary("Returns CREATE TABLE DDL for config system")
+                .WithTags("Database Configuration")
+                .WithOpenApi();
     }
 }
+

@@ -1,11 +1,13 @@
-﻿using Common.Data.Configurations;
+﻿using AuthAPI.Data.UserToken;
+using Common.Data.Configurations;
+using Common.Features.NameHelper;
 using EFCore.NamingConventions.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.Tables;
 
-public class TUserTokenConfiguration(INameRewriter nameRewriter) : EntityConfigurationBase<TUserToken>(nameRewriter)
+public class TUserTokenConfiguration(INameHelper nameRewriter) : EntityConfigurationBase<TUserToken>(nameRewriter)
 {
     public override void Configure(EntityTypeBuilder<TUserToken> builder)
     {

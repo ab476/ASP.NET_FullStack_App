@@ -1,10 +1,13 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
 
 namespace Common.Features.DatabaseConfiguration.Provider;
 
 public sealed class DatabaseConfigurationProvider(
     IDbContextFactory<ConfigurationDbContext> dbFactory,
-    ILogger<DatabaseConfigurationProvider> _logger) : IConfigurationProvider, IDisposable
+    ILogger<DatabaseConfigurationProvider> _logger,
+    IWebHostEnvironment _environment) : IConfigurationProvider, IDisposable
 {
     private readonly IDbContextFactory<ConfigurationDbContext> _dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
     private readonly Dictionary<string, string?> _store = new(StringComparer.Ordinal);
@@ -56,6 +59,11 @@ public sealed class DatabaseConfigurationProvider(
 
         _store.Clear();
 
+        if(_environment.IsDevelopment())
+        {
+            _logger.LogInformation("Ensuring database is created (Development environment).");
+            EnsureCreatedAsync(db).GetAwaiter().GetResult();
+        }
         var entries = db.TConfigurations
             .TagWith("DatabaseConfigurationProvider: Full Load")
             .OrderBy(e => e.Key)
@@ -77,6 +85,10 @@ public sealed class DatabaseConfigurationProvider(
         );
     }
 
+    private async Task EnsureCreatedAsync(ConfigurationDbContext dbContext)
+    {
+        await dbContext.Database.EnsureCreatedAsync();
+    }
     // ---------------------------------------------------------
     // Polling Logic
     // ---------------------------------------------------------

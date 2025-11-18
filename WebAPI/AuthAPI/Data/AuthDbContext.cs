@@ -5,14 +5,15 @@ using AuthAPI.Data.UserAddress;
 using AuthAPI.Data.UserClaim;
 using AuthAPI.Data.UserLogin;
 using AuthAPI.Data.UserRole;
-using EFCore.NamingConventions.Internal;
+using AuthAPI.Data.UserToken;
+using Common.Features.NameHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AuthAPI.Data;
 
 
-public class AuthDbContext(DbContextOptions<AuthDbContext> options, INameRewriter nameRewriter, IEntityConfigurationAggregator aggregator)
+public class AuthDbContext(DbContextOptions<AuthDbContext> options)
         : IdentityDbContext<
         TUser,
         TRole,
@@ -23,6 +24,7 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options, INameRewrite
         TRoleClaim,
         TUserToken>(options)
 {
+    private readonly INameHelper nameHelper = NameHelper.Default;
     public DbSet<TUser> TUsers => base.Users;
     public DbSet<TRole> TRoles => base.Roles;
     public DbSet<TUserClaim> TUserClaims => base.UserClaims;
@@ -43,8 +45,17 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options, INameRewrite
     {
         base.OnModelCreating(modelBuilder);
 
-        aggregator.ApplyAutoConfigurations(modelBuilder, nameRewriter);
-        
+        new TUserConfiguration(nameHelper).Configure(modelBuilder.Entity<TUser>());
+        new TRoleConfiguration(nameHelper).Configure(modelBuilder.Entity<TRole>());
+
+        new TUserClaimConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserClaim>());
+        new TRoleClaimConfiguration(nameHelper).Configure(modelBuilder.Entity<TRoleClaim>());
+
+        new TUserRoleConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserRole>());
+        new TUserLoginConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserLogin>());
+        new TUserAddressConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserAddress>());
+        new TUserTokenConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserToken>());
+
     }
 }
 

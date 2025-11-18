@@ -7,7 +7,7 @@ public static class HostEnvironmentExtensions
     /// </summary>
     public static bool IsTestEnvironment(this IConfiguration config)
     {
-        return config["TEST_ENV"] == "true";
+        return config.GetValue<bool>("TEST_ENV") == true;
     }
 }
 

@@ -8,8 +8,6 @@ public class DatabaseConfigurationOptions
     // Hook for additional DbContext options:
     public Action<DbContextOptionsBuilder>? ConfigureDbContext { get; set; }
 
-    public bool MapDbScriptRoute { get; set; }
-
-    public const string DefaultDbScriptRoute = "/config/db-script";
+    public const string DefaultDbScriptRoute = "/config/database-schema";
     public string? DbScriptRoute { get; set; }
 }

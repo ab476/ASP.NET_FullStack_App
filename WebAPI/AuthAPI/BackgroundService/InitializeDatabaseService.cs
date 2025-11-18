@@ -3,7 +3,9 @@
 using AuthAPI.Data;
 using AuthAPI.Data.Role;
 using AuthAPI.Data.User;
+using Common.Features.DatabaseConfiguration.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -35,11 +37,16 @@ public class InitializeDatabaseService(
         await using var scope = _scopeFactory.CreateAsyncScope();
         var provider = scope.ServiceProvider;
 
-        var dbContext = provider.GetRequiredService<AuthDbContext>();
+        var authDbContext = provider.GetRequiredService<AuthDbContext>();
+        var configDbContextFactory = provider.GetRequiredService<IDbContextFactory<ConfigurationDbContext>>();
+        using var configDbContext = await configDbContextFactory.CreateDbContextAsync(cancellationToken);
+
         var userManager = provider.GetRequiredService<UserManager<TUser>>();
         var roleManager = provider.GetRequiredService<RoleManager<TRole>>();
 
-        await EnsureDatabaseCreatedAsync(dbContext, cancellationToken);
+        await EnsureDatabaseCreatedAsync(authDbContext, cancellationToken);
+        await EnsureDatabaseCreatedAsync(configDbContext, cancellationToken);
+
         await EnsureRoleExistsAsync(roleManager, AdminRole);
 
         await EnsureUserExistsAsync(userManager, AdminEmail, AdminRole);
@@ -48,7 +55,7 @@ public class InitializeDatabaseService(
         _logger.LogInformation("Initialization completed successfully.");
     }
 
-    private async Task EnsureDatabaseCreatedAsync(AuthDbContext dbContext, CancellationToken ct)
+    private async Task EnsureDatabaseCreatedAsync(DbContext dbContext, CancellationToken ct)
     {
         _logger.LogInformation("Ensuring database is created...");
         //await dbContext.Database.EnsureDeletedAsync(ct);

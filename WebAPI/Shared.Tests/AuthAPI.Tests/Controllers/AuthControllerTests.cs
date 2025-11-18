@@ -3,7 +3,8 @@ using System.Net.Http.Json;
 
 namespace Shared.Tests.AuthAPI.Tests.Controllers;
 
-public class AuthControllerTests(AuthIntegrationTestContext context) : IClassFixture<AuthIntegrationTestContext>
+[Collection(TestConstants.Auth)]
+public class AuthControllerTests(AuthIntegrationTestContext context)
 {
     private readonly HttpClient _client = context.Client;
 

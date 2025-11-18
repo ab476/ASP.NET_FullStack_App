@@ -1,8 +1,7 @@
-﻿using EFCore.NamingConventions.Internal;
-
-namespace Common.Features.DatabaseConfiguration.Data;
-public class ConfigurationDbContext(DbContextOptions<ConfigurationDbContext> options, INameRewriter rewriter) : DbContext(options)
+﻿namespace Common.Features.DatabaseConfiguration.Data;
+public class ConfigurationDbContext(DbContextOptions<ConfigurationDbContext> options) : DbContext(options)
 {
+    private readonly INameHelper nameHelper = NameHelper.NameHelper.Default;
     public DbSet<TConfigurationEntry> TConfigurations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,7 +26,7 @@ public class ConfigurationDbContext(DbContextOptions<ConfigurationDbContext> opt
 
         modelBuilder.Entity<TConfigurationEntry>()
             .HasIndex(e => e.LastUpdated)
-            .HasDatabaseName(rewriter.RewriteName("IX_Config_LastUpdated"));
+            .HasDatabaseName(nameHelper.RewriteName("IX_Config_LastUpdated"));
 
     }
 }

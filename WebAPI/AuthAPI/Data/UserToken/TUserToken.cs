@@ -1,4 +1,4 @@
-﻿namespace AuthAPI.Data.Tables;
+﻿namespace AuthAPI.Data.UserToken;
 
 public class TUserToken : IdentityUserToken<Guid>
 {

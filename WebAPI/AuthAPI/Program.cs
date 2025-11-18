@@ -1,31 +1,35 @@
-﻿using AuthAPI.BackgroundService;
-using AuthAPI.Data;
-using AuthAPI.Data.Role;
-using AuthAPI.Data.TableConfigurations;
-using AuthAPI.Data.User;
-using AuthAPI.Endpoints;
+﻿using AuthAPI.Endpoints;
 using AuthAPI.Extensions.ServiceCollectionExtensions;
-using AuthAPI.Models.Validators;
-using AuthAPI.Services.SqlSchema;
-using AuthAPI.Services.Time;
-using EFCore.NamingConventions.Internal;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
+var configuration = builder.Configuration;
 
 // Host configuration
 builder.Host.ConfigureDefaultServiceProvider(builder.Environment);
 
+configuration
+    .AddDatabaseConfiguration(services, options =>
+    {
+        options.ConfigureDbContext = dbOptions =>
+        {
+            var connectionString = configuration.GetConnectionString("ConfigurationDatabase");
+            dbOptions.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            dbOptions.UseSnakeCaseNamingConvention(CultureInfo.CurrentCulture);
+        };
+    });
+
 // Service registration
-services.AddSwaggerDocumentation();
-services.AddAppOptions(builder.Configuration);
-services.AddInfrastructureServices();
-services.AddDatabaseServices(builder.Configuration);
-services.AddIdentityServices();
-services.AddValidationServices();
-services.AddAuthenticationServices(builder.Configuration);
-services.AddControllerServices();
+services.AddSwaggerDocumentation()
+    .AddAppOptions(configuration)
+    .AddInfrastructureServices()
+    .AddDatabaseServices(configuration)
+    .AddIdentityServices()
+    .AddValidationServices()
+    .AddAuthenticationServices(configuration)
+    .AddControllerServices();
 
 
 var app = builder.Build();
@@ -35,9 +39,10 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapKeyGenEndpoints();
+app.MapKeyGenEndpoints()
+    .MapDatabaseConfigurationEndpoints();
 
-app.Run();
+await app.RunAsync();
 
 public partial class Program { }
 

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.5.0" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>8943c6de-385d-414c-ab28-cb6e3b86d9b8</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.MySql" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.MySql.Extensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AuthAPI\AuthAPI.csproj" />
+  </ItemGroup>
+
+</Project>

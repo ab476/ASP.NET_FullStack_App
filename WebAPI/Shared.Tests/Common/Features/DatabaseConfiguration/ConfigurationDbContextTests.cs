@@ -1,4 +1,5 @@
 ﻿using Common.Features.DatabaseConfiguration.Data;
+using Common.Features.NameHelper;
 using EFCore.NamingConventions.Internal;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.MySql;
@@ -27,11 +28,11 @@ public class ConfigurationDbContextTests : IAsyncLifetime
         var options = new DbContextOptionsBuilder<ConfigurationDbContext>()
             .UseMySql(_container.GetConnectionString(), ServerVersion.AutoDetect(_container.GetConnectionString()))
             .Options;
-
-        return new ConfigurationDbContext(options, new FakeRewriter());
+        NameHelper.Default = new FakeNameHelper();
+        return new ConfigurationDbContext(options);
     }
 
-    private class FakeRewriter : INameRewriter
+    private class FakeNameHelper : INameHelper
     {
         public string RewriteName(string name) => name;
     }

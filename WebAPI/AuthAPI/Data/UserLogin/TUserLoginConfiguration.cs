@@ -1,11 +1,12 @@
 ﻿using Common.Data.Configurations;
+using Common.Features.NameHelper;
 using EFCore.NamingConventions.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.UserLogin;
 
-public class TUserLoginConfiguration(INameRewriter nameRewriter) : EntityConfigurationBase<TUserLogin>(nameRewriter)
+public class TUserLoginConfiguration(INameHelper nameRewriter) : EntityConfigurationBase<TUserLogin>(nameRewriter)
 {
     public override void Configure(EntityTypeBuilder<TUserLogin> builder)
     {

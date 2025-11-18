@@ -1,12 +1,11 @@
-﻿using EFCore.NamingConventions.Internal;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Common.Data.Configurations;
-public abstract class EntityConfigurationBase<TEntity>(INameRewriter nameRewriter) 
+public abstract class EntityConfigurationBase<TEntity>(INameHelper nameRewriter) 
     : IEntityTypeConfiguration<TEntity>
     where TEntity : class
 {
-    protected INameRewriter NameRewriter { get; }
+    protected INameHelper NameRewriter { get; }
         = nameRewriter
           ?? throw new ArgumentNullException(nameof(nameRewriter));
 
