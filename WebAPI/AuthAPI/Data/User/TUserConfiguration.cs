@@ -1,6 +1,5 @@
 ﻿using Common.Data.Configurations;
 using Common.Features.NameHelper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.User;
@@ -17,4 +16,3 @@ public class TUserConfiguration(INameHelper nameRewriter) : EntityConfigurationB
         builder.Property(u => u.NormalizedEmail).HasMaxLength(256);
     }
 }
-

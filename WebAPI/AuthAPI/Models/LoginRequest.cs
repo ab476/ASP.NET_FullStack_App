@@ -8,4 +8,3 @@ public class LoginRequest
 
     public bool RememberMe { get; set; }
 }
-

@@ -112,4 +112,3 @@ public partial class SqlSchemaParserService : ISqlSchemaParser
     [GeneratedRegex(@"CREATE\s+(UNIQUE\s+)?INDEX\s+\[([^\]]+)\]\s+ON\s+\[([^\]]+)\]\s+\(\[([^\]]+)\]\)", RegexOptions.IgnoreCase | RegexOptions.Multiline, "en-US")]
     private static partial Regex IndexRegex();
 }
-

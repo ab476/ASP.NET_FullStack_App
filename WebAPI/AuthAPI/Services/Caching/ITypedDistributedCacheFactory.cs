@@ -2,5 +2,5 @@
 
 public interface ITypedDistributedCacheFactory
 {
-    ITypedDistributedCache<TService> GetCache<TService>()  where TService : class;
+    ITypedDistributedCache<TService> GetCache<TService>() where TService : class;
 }

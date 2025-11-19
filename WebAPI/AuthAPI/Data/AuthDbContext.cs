@@ -7,7 +7,6 @@ using AuthAPI.Data.UserLogin;
 using AuthAPI.Data.UserRole;
 using AuthAPI.Data.UserToken;
 using Common.Features.NameHelper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AuthAPI.Data;
@@ -39,7 +38,7 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options)
         base.ConfigureConventions(configurationBuilder);
 
         configurationBuilder.Properties<Guid>().HaveConversion<GuidToBytesConverter>();
-            
+
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,4 +57,3 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options)
 
     }
 }
-

@@ -9,4 +9,3 @@ public class TypedDistributedCacheFactory(IServiceProvider serviceProvider) : IT
         return _serviceProvider.GetRequiredService<ITypedDistributedCache<TService>>();
     }
 }
-

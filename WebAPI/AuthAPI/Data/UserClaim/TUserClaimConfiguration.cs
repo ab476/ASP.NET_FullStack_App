@@ -1,6 +1,5 @@
 ﻿using Common.Data.Configurations;
 using Common.Features.NameHelper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.UserClaim;
@@ -15,4 +14,3 @@ public class TUserClaimConfiguration(INameHelper nameRewriter) : EntityConfigura
         builder.Property(uc => uc.ClaimValue).HasMaxLength(1024);
     }
 }
-

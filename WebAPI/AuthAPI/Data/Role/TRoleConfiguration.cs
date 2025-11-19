@@ -1,6 +1,5 @@
 ﻿using Common.Data.Configurations;
 using Common.Features.NameHelper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.Role;
@@ -26,4 +25,3 @@ public class TRoleConfiguration(INameHelper nameRewriter) : EntityConfigurationB
         builder.Property(r => r.ModifiedOn);
     }
 }
-

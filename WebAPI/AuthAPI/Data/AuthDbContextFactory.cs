@@ -1,12 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace AuthAPI.Data;
+﻿namespace AuthAPI.Data;
 
 public class AuthDbContextFactory(IMultiDatabaseConfig _dbOptions)
 {
 
     public void Configure(DbContextOptionsBuilder options)
     {
+        options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+
         var activeDb = _dbOptions.ActiveDatabase;
         var connStr = _dbOptions.GetActiveConnectionString();
 
@@ -29,16 +29,16 @@ public class AuthDbContextFactory(IMultiDatabaseConfig _dbOptions)
                 break;
 
             case DatabaseType.Oracle:
-            {
-                options.UseOracle(connStr)
-                        .UseUpperSnakeCaseNamingConvention();
-                break;
-            }
+                {
+                    options.UseOracle(connStr)
+                            .UseUpperSnakeCaseNamingConvention();
+                    break;
+                }
             default:
                 throw new InvalidOperationException($"Unsupported database: {activeDb}");
         }
 
-        if(activeDb is not DatabaseType.Oracle)
+        if (activeDb is not DatabaseType.Oracle)
         {
             options.UseSnakeCaseNamingConvention();
         }

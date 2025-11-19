@@ -6,7 +6,7 @@ namespace AuthAPI.Services.Caching;
 public class TypedDistributedCache<TService>(
     IDistributedCache cache,
     ILogger<TypedDistributedCache<TService>> logger
-) : ITypedDistributedCache<TService> 
+) : ITypedDistributedCache<TService>
     where TService : class
 {
     private readonly IDistributedCache _cache = cache;

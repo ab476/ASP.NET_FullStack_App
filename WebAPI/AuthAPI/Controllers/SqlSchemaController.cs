@@ -1,7 +1,6 @@
 ﻿using AuthAPI.Data;
 using AuthAPI.Services.SqlSchema;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AuthAPI.Controllers;
 

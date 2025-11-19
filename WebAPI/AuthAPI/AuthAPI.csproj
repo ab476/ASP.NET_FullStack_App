@@ -11,6 +11,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="EFCore.NamingConventions" />
+		<PackageReference Include="FluentValidation" />
 		<PackageReference Include="MemoryPack" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
@@ -33,6 +34,12 @@
 	<ItemGroup>
 		<ProjectReference Include="..\CoustomSourceGenerator\Common.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 		<ProjectReference Include="..\Shared\Common.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Features\" />
+	  <Folder Include="Models\Responses\" />
+	  <Folder Include="Models\Requests\" />
 	</ItemGroup>
 
 </Project>

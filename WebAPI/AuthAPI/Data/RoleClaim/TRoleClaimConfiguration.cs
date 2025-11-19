@@ -1,6 +1,5 @@
 ﻿using Common.Data.Configurations;
 using Common.Features.NameHelper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.RoleClaim;
@@ -16,4 +15,3 @@ public class TRoleClaimConfiguration(INameHelper nameRewriter) : EntityConfigura
         builder.Property(rc => rc.ClaimValue).HasMaxLength(1024);
     }
 }
-

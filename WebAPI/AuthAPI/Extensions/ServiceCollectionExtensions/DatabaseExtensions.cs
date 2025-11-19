@@ -17,7 +17,7 @@ public static class DatabaseExtensions
 
             services.AddHostedService<InitializeDatabaseService>();
         }
-        
+
 
         return services;
     }

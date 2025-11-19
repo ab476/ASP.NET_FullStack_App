@@ -1,8 +1,6 @@
 ﻿using AuthAPI.Data.UserToken;
 using Common.Data.Configurations;
 using Common.Features.NameHelper;
-using EFCore.NamingConventions.Internal;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.Tables;
@@ -28,4 +26,3 @@ public class TUserTokenConfiguration(INameHelper nameRewriter) : EntityConfigura
                .IsRequired();
     }
 }
-

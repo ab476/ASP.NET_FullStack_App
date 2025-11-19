@@ -1,6 +1,5 @@
 ﻿using Common.Features.DatabaseConfiguration.Data;
 using Common.Features.NameHelper;
-using EFCore.NamingConventions.Internal;
 using Microsoft.EntityFrameworkCore;
 using Testcontainers.MySql;
 

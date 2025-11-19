@@ -1,7 +1,5 @@
 ﻿using Common.Data.Configurations;
 using Common.Features.NameHelper;
-using EFCore.NamingConventions.Internal;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.UserRole;
@@ -20,4 +18,3 @@ public class TUserRoleConfiguration(INameHelper nameRewriter) : EntityConfigurat
         builder.HasIndex(ur => ur.RoleId).HasDatabaseName(Rewrite("IX_UserRoles_RoleId"));
     }
 }
-

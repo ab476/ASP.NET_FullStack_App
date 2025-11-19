@@ -1,6 +1,8 @@
 ﻿using AuthAPI.Endpoints;
 using AuthAPI.Extensions.ServiceCollectionExtensions;
-using Microsoft.EntityFrameworkCore;
+using AuthAPI.Features.UserAddresses;
+using AuthAPI.Services.UserAddresses.Endpoints;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,16 +32,22 @@ services.AddSwaggerDocumentation()
     .AddValidationServices()
     .AddAuthenticationServices(configuration)
     .AddControllerServices();
-
+services.AddUserAddressFeature();
 
 var app = builder.Build();
 app.UseSwaggerDocumentation(app.Environment);
+
+app.UseExceptionHandler("/error");          // Custom fallback endpoint
+app.UseHsts();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapKeyGenEndpoints()
+app
+    .MapUserAddressEndpoints()
+    .MapGlobalErrorEndpoint()
+    .MapKeyGenEndpoints()
     .MapDatabaseConfigurationEndpoints();
 
 await app.RunAsync();

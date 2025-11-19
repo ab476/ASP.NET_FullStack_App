@@ -10,4 +10,3 @@ public static class HostEnvironmentExtensions
         return config.GetValue<bool>("TEST_ENV") == true;
     }
 }
-

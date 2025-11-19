@@ -1,6 +1,5 @@
 ﻿using Common.Data.Configurations;
 using Common.Features.NameHelper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AuthAPI.Data.UserAddress;
@@ -31,9 +30,6 @@ public class TUserAddressConfiguration(INameHelper nameRewriter) : EntityConfigu
                .IsRequired()
                .HasMaxLength(100);
 
-        builder.Property(a => a.IsActive)
-               .HasDefaultValue(true);
-
         builder.Property(a => a.CreatedOn);
 
         builder.Property(a => a.ModifiedOn);
@@ -45,4 +41,3 @@ public class TUserAddressConfiguration(INameHelper nameRewriter) : EntityConfigu
                .OnDelete(DeleteBehavior.Cascade); // Optional: enforce cascade delete
     }
 }
-

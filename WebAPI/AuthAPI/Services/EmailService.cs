@@ -85,4 +85,3 @@ public class EmailService(IOptions<EmailSettings> emailOptions, ITimeProvider ti
         }
     }
 }
-
