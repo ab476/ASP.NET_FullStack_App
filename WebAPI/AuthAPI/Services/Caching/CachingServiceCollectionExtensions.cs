@@ -4,13 +4,15 @@ namespace AuthAPI.Services.Caching;
 
 public static class CachingServiceCollectionExtensions
 {
-    public static IServiceCollection AddCaching(this IServiceCollection services)
+    public static IServiceCollection AddRedisDistributedCache(this IServiceCollection services, IHostApplicationBuilder builder)
     {
-        services.AddDistributedMemoryCache();
+        builder.AddRedisDistributedCache("cache");
 
-        services.TryAddSingleton(typeof(ITypedDistributedCache<>), typeof(TypedDistributedCache<>)); // open generic registration
+        //services.AddDistributedMemoryCache();
 
-        services.TryAddSingleton<ITypedDistributedCacheFactory, TypedDistributedCacheFactory>();
+        services.TryAddSingleton(typeof(ICacheService<>), typeof(CacheService<>)); // open generic registration
+
+        services.TryAddSingleton<ICacheServiceFactory, CacheServiceFactory>();
 
         return services;
     }

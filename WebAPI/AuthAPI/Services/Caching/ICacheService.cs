@@ -1,7 +1,7 @@
 ﻿
 namespace AuthAPI.Services.Caching;
 
-public interface ITypedDistributedCache<TService> where TService : class
+public interface ICacheService<TService> where TService : class
 {
     Task<TValue?> GetAsync<TValue>(string key);
     Task RemoveAsync(string key);

@@ -30,18 +30,24 @@ public static class UserAddressEndpoints
 
         // CREATE an address for a user
         userGroup.MapPost("/", 
-            async Task<Ok<UserAddressResponse>> (
+            async Task<Results<Ok<UserAddressResponse>, ValidationProblem>> (
                 Guid userId,
                 CreateUserAddressRequest request,
                 [FromServices] IUserAddressService service,
+                [FromServices] IValidator<CreateUserAddressRequest> validator,
                 CancellationToken ct) =>
             {
                 request.UserId = userId;
+                var results = await validator.ValidateAsync(request, ct);
+                if (!results.IsValid)
+                {
+                    return TypedResults.ValidationProblem(results.ToDictionary());
+                }
+
                 var created = await service.CreateAsync(request, ct);
                 return TypedResults.Ok(created);
             }
-        )
-        .WithValidation<CreateUserAddressRequest>();
+        );
 
 
 

@@ -3,14 +3,14 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace AuthAPI.Services.Caching;
 
-public class TypedDistributedCache<TService>(
+public class CacheService<TService>(
     IDistributedCache cache,
-    ILogger<TypedDistributedCache<TService>> logger
-) : ITypedDistributedCache<TService>
+    ILogger<CacheService<TService>> logger
+) : ICacheService<TService>
     where TService : class
 {
     private readonly IDistributedCache _cache = cache;
-    private readonly ILogger<TypedDistributedCache<TService>> _logger = logger;
+    private readonly ILogger<CacheService<TService>> _logger = logger;
 
     private readonly string _FullName = typeof(TService).FullName!;
 
@@ -55,6 +55,9 @@ public class TypedDistributedCache<TService>(
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex,
+                "MemoryPack serialization failed for type {Type}.",
+                _FullName);
             throw new InvalidOperationException(
                 $"MemoryPack serialization failed for '{_FullName}'.", ex);
         }
