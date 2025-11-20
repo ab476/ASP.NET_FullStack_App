@@ -16,7 +16,6 @@ public static class UserAddressEndpoints
         var userGroup = app.MapGroup("api/users/{userId:guid}/addresses")
                            .WithTags("User Addresses");
 
-        // GET all addresses for a user
         userGroup.MapGet("/",
             async Task<Ok<IEnumerable<UserAddressResponse>>> (
                 Guid userId,
@@ -26,9 +25,8 @@ public static class UserAddressEndpoints
                 var result = await service.GetByUserIdAsync(userId, ct);
                 return TypedResults.Ok(result);
             }
-        );
+        ).WithSummary("GET all addresses for a user");
 
-        // CREATE an address for a user
         userGroup.MapPost("/", 
             async Task<Results<Ok<UserAddressResponse>, ValidationProblem>> (
                 Guid userId,
@@ -47,9 +45,7 @@ public static class UserAddressEndpoints
                 var created = await service.CreateAsync(request, ct);
                 return TypedResults.Ok(created);
             }
-        );
-
-
+        ).WithSummary("CREATE an address for a user");
 
         // -------------------------------------------
         // ADDRESS-SCOPED ENDPOINTS (no userId needed)
@@ -57,7 +53,6 @@ public static class UserAddressEndpoints
         var addressGroup = app.MapGroup("api/addresses")
                               .WithTags("User Addresses");
 
-        // GET address by Id
         addressGroup.MapGet("/{id:guid}",
             async Task<Results<Ok<UserAddressResponse>, NotFound>> (
                 Guid id,
@@ -67,9 +62,8 @@ public static class UserAddressEndpoints
                 var result = await service.GetByIdAsync(id, ct);
                 return result is null ? TypedResults.NotFound() : TypedResults.Ok(result);
             }
-        );
+        ).WithSummary("GET address by Id");
 
-        // UPDATE address by Id
         addressGroup.MapPut("/{id:guid}", 
             async Task<Results<Ok, NotFound>>  (
                 Guid id,
@@ -81,10 +75,9 @@ public static class UserAddressEndpoints
                 return updated  ? TypedResults.Ok() : TypedResults.NotFound();
             }
         )
-        .WithValidation<UpdateUserAddressRequest>();
+        .WithValidation<UpdateUserAddressRequest>()
+        .WithSummary("UPDATE address by Id");
 
-
-        // DELETE address by Id
         addressGroup.MapDelete("/{id:guid}", 
             async Task<Results<Ok, NotFound>> (
                 Guid id,
@@ -94,7 +87,7 @@ public static class UserAddressEndpoints
                 var deleted = await service.DeleteAsync(id, ct);
                 return deleted ? TypedResults.Ok() : TypedResults.NotFound();
             }
-        );
+        ).WithSummary("DELETE address by Id");
 
         return app;
     }
