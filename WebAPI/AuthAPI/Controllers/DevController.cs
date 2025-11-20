@@ -12,7 +12,7 @@ public class DevController(AuthDbContext _context, IMultiDatabaseConfig _databas
     {
         var createScript = _context.Database.GenerateCreateScript();
 
-        var fileContent = System.Text.Encoding.UTF8.GetBytes(createScript);
+        var fileContent = Encoding.UTF8.GetBytes(createScript);
 
         var dbName = _context.Database.GetDbConnection().Database;
         var timestamp = timeProvider.UtcNow.ToString("yyyy-MMM-dd_HH-mm-ss");
