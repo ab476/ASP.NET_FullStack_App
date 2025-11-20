@@ -3,16 +3,16 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace AuthAPI.Services.Caching;
 
-public class CacheService<TService>(
-    IDistributedCache cache,
-    ILogger<CacheService<TService>> logger
-) : ICacheService<TService>
-    where TService : class
+public class CacheService(
+    IDistributedCache _cache,
+    ILogger<CacheService> _logger,
+    ICachePrefixProvider _cachePrefix
+) : ICacheService
 {
-    private readonly IDistributedCache _cache = cache;
-    private readonly ILogger<CacheService<TService>> _logger = logger;
+    private readonly IDistributedCache _cache = _cache;
+    private readonly ILogger<CacheService> _logger = _logger;
 
-    private readonly string _FullName = typeof(TService).FullName!;
+    private readonly string _FullName = $"{_cachePrefix.Project}:{_cachePrefix.Environment}:";
 
     public async Task<(bool Found, TValue? Value)> TryGetValueAsync<TValue>(string key)
     {
@@ -42,6 +42,23 @@ public class CacheService<TService>(
         await _cache.SetAsync(BuildKey(key), Serialize(item), options);
     }
 
+    public async Task<TValue?> GetOrSetAsync<TValue>(
+        string key,
+        Func<Task<TValue?>> factory,
+        int ttlMinutes)
+    {
+        var (found, cached) = await TryGetValueAsync<TValue>(key);
+
+        if (found)
+            return cached;
+
+        var result = await factory();
+
+        if (result is not null)
+            await SetAsync(key, result, ttlMinutes);
+
+        return result;
+    }
     public Task RemoveAsync(string key) =>
         _cache.RemoveAsync(BuildKey(key));
 

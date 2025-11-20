@@ -8,11 +8,12 @@ public static class CachingServiceCollectionExtensions
     {
         builder.AddRedisDistributedCache("cache");
 
+        var env = builder.Environment;
+
         //services.AddDistributedMemoryCache();
+        services.TryAddSingleton<ICachePrefixProvider>(new CachePrefixProvider(env.ApplicationName, env.EnvironmentName));
 
-        services.TryAddSingleton(typeof(ICacheService<>), typeof(CacheService<>)); // open generic registration
-
-        services.TryAddSingleton<ICacheServiceFactory, CacheServiceFactory>();
+        services.TryAddSingleton<ICacheService, CacheService>();
 
         return services;
     }
