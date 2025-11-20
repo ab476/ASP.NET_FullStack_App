@@ -18,5 +18,8 @@ var authApi = builder
     .WaitFor(redisCache)
     .WaitFor(configurationDB);
 
-
+// Next.js app
+var next = builder.AddNpmApp("webapp", "../NextJSWebApp", "dev")
+                  .WithHttpEndpoint(env: "PORT")
+                  .PublishAsDockerFile(); // Next.js uses PORT env
 builder.Build().Run();

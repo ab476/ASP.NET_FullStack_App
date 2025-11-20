@@ -6,6 +6,7 @@
   <ItemGroup>
     <!-- EF Core 8 (Stable) -->
     <PackageVersion Include="Aspire.Hosting.MySql" Version="9.5.2" />
+    <PackageVersion Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
     <PackageVersion Include="Aspire.Hosting.Redis" Version="9.5.0" />
     <PackageVersion Include="Aspire.StackExchange.Redis.DistributedCaching" Version="9.5.0" />
     <PackageVersion Include="CommunityToolkit.Aspire.Hosting.MySql.Extensions" Version="9.5.0" />

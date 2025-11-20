@@ -1,6 +1,9 @@
-﻿namespace AuthAPI.Services.UserAddresses.Contracts;
+﻿using MemoryPack;
 
-public class UserAddressResponse
+namespace AuthAPI.Services.UserAddresses.Contracts;
+
+[MemoryPackable]
+public partial class UserAddressResponse
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
