@@ -71,14 +71,14 @@ public static class UserAddressEndpoints
 
         // UPDATE address by Id
         addressGroup.MapPut("/{id:guid}", 
-            async Task<Results<Ok<bool>, NotFound>>  (
+            async Task<Results<Ok, NotFound>>  (
                 Guid id,
                 UpdateUserAddressRequest request,
                 [FromServices] IUserAddressService service,
                 CancellationToken ct) =>
             {
                 var updated = await service.UpdateAsync(id, request, ct);
-                return updated != true ? TypedResults.NotFound() : TypedResults.Ok(updated);
+                return updated  ? TypedResults.Ok() : TypedResults.NotFound();
             }
         )
         .WithValidation<UpdateUserAddressRequest>();
