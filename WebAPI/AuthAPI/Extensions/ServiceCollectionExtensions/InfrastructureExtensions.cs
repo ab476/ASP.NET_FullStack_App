@@ -1,6 +1,4 @@
-﻿using AuthAPI.Data;
-using AuthAPI.Services.SqlSchema;
-using AuthAPI.Services.Time;
+﻿using AuthAPI.Services.SqlSchema;
 
 namespace AuthAPI.Extensions.ServiceCollectionExtensions;
 

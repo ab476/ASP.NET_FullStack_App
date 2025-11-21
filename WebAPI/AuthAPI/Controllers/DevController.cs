@@ -1,5 +1,4 @@
-﻿using AuthAPI.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 
 namespace AuthAPI.Controllers;

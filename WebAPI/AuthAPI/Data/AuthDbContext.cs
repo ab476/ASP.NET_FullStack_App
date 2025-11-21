@@ -1,11 +1,5 @@
-﻿using AuthAPI.Data.Role;
-using AuthAPI.Data.RoleClaim;
-using AuthAPI.Data.User;
-using AuthAPI.Data.UserAddress;
-using AuthAPI.Data.UserClaim;
-using AuthAPI.Data.UserLogin;
-using AuthAPI.Data.UserRole;
-using AuthAPI.Data.UserToken;
+﻿using AuthAPI.Data.Configurations;
+using AuthAPI.Data.Models;
 using Common.Features.NameHelper;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -33,6 +27,10 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options)
     public DbSet<TUserToken> TUserTokens => base.UserTokens;
     public DbSet<TUserAddress> TUserAddresses { get; set; }
 
+    public DbSet<TRefreshToken> TRefreshTokens { get; set; }
+    public DbSet<TSingleUseToken> TSingleUseTokens { get; set; }
+    public DbSet<TApiKey> TApiKeys { get; set; }
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         base.ConfigureConventions(configurationBuilder);
@@ -44,16 +42,19 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options)
     {
         base.OnModelCreating(modelBuilder);
 
-        new TUserConfiguration(nameHelper).Configure(modelBuilder.Entity<TUser>());
-        new TRoleConfiguration(nameHelper).Configure(modelBuilder.Entity<TRole>());
+        modelBuilder.ApplyConfiguration(new TUserConfiguration(nameHelper));
+        modelBuilder.ApplyConfiguration(new TRoleConfiguration(nameHelper));
+        modelBuilder.ApplyConfiguration(new TUserClaimConfiguration(nameHelper));
+        modelBuilder.ApplyConfiguration(new TRoleClaimConfiguration(nameHelper));
+        modelBuilder.ApplyConfiguration(new TUserRoleConfiguration(nameHelper));
+        modelBuilder.ApplyConfiguration(new TUserLoginConfiguration(nameHelper));
+        modelBuilder.ApplyConfiguration(new TUserAddressConfiguration(nameHelper));
+        modelBuilder.ApplyConfiguration(new TUserTokenConfiguration(nameHelper));
 
-        new TUserClaimConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserClaim>());
-        new TRoleClaimConfiguration(nameHelper).Configure(modelBuilder.Entity<TRoleClaim>());
-
-        new TUserRoleConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserRole>());
-        new TUserLoginConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserLogin>());
-        new TUserAddressConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserAddress>());
-        new TUserTokenConfiguration(nameHelper).Configure(modelBuilder.Entity<TUserToken>());
+        // custom tokens
+        modelBuilder.ApplyConfiguration(new TRefreshTokenConfiguration());
+        modelBuilder.ApplyConfiguration(new TSingleUseTokenConfiguration());
+        modelBuilder.ApplyConfiguration(new TApiKeyConfiguration());
 
     }
 }

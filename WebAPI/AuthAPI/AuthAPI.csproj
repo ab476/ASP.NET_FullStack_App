@@ -34,13 +34,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\CoustomSourceGenerator\Common.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
 		<ProjectReference Include="..\Shared\Common.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Features\" />
-	  <Folder Include="Models\Responses\" />
-	  <Folder Include="Models\Requests\" />
 	</ItemGroup>
 
 </Project>

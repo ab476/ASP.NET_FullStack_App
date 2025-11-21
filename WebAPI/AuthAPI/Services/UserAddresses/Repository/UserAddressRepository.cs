@@ -1,5 +1,4 @@
-﻿using AuthAPI.Data;
-using AuthAPI.Services.UserAddresses;
+﻿using AuthAPI.Services.UserAddresses;
 using AuthAPI.Services.UserAddresses.Contracts;
 
 namespace AuthAPI.Services.UserAddresses.Repository;

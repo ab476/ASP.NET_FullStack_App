@@ -1,5 +1,4 @@
-﻿using AuthAPI.Data;
-using AuthAPI.Services.SqlSchema;
+﻿using AuthAPI.Services.SqlSchema;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthAPI.Controllers;

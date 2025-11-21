@@ -1,4 +1,4 @@
-﻿using AuthAPI.Data.UserAddress;
+﻿using AuthAPI.Data.Models;
 using AuthAPI.Services.UserAddresses.Contracts;
 using Riok.Mapperly.Abstractions;
 

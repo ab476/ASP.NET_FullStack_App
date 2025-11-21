@@ -1,0 +1,21 @@
+﻿using AuthAPI.Data.Models;
+using Common.Data.Configurations;
+using Common.Features.NameHelper;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace AuthAPI.Data.Configurations;
+
+public class TUserRoleConfiguration(INameHelper nameRewriter) : EntityConfigurationBase<TUserRole>(nameRewriter)
+{
+    public override void Configure(EntityTypeBuilder<TUserRole> builder)
+    {
+        builder.ToTable(Rewrite(nameof(AuthDbContext.TUserRoles)));
+
+        // Foreign keys
+        builder.Property(ur => ur.UserId).IsRequired();
+        builder.Property(ur => ur.RoleId).IsRequired();
+
+        // Optional indexes for fast lookups
+        builder.HasIndex(ur => ur.RoleId).HasDatabaseName(Rewrite("IX_UserRoles_RoleId"));
+    }
+}

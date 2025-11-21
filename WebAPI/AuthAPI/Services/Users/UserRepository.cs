@@ -1,6 +1,4 @@
-﻿using AuthAPI.Data;
-
-namespace AuthAPI.Services.Users;
+﻿namespace AuthAPI.Services.Users;
 
 public class UserRepository(AuthDbContext db) : IUserRepository
 {

@@ -1,11 +1,11 @@
 ﻿
-global using AuthAPI.Data.Tables;
+global using AuthAPI.Data;
 global using AuthAPI.Models;
 global using AuthAPI.Services.IServices;
 global using Common.Configurations;
 global using Common.Extensions;
 global using Common.Features.DatabaseConfiguration;
-global using Common.Services.Time;
+global using Common.Infrastructure.Time;
 // Common libraries
 global using Common.Swagger;
 global using FluentValidation;

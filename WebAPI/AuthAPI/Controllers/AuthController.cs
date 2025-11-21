@@ -1,4 +1,4 @@
-﻿using AuthAPI.Data.User;
+﻿using AuthAPI.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;

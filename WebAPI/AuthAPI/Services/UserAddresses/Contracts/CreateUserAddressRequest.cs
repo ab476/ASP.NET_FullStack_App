@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace AuthAPI.Services.UserAddresses.Contracts;
+﻿namespace AuthAPI.Services.UserAddresses.Contracts;
 
 public class CreateUserAddressRequest
 {

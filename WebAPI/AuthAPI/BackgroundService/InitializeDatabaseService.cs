@@ -1,8 +1,7 @@
 ﻿namespace AuthAPI.BackgroundService;
 
 using AuthAPI.Data;
-using AuthAPI.Data.Role;
-using AuthAPI.Data.User;
+using AuthAPI.Data.Models;
 using Common.Features.DatabaseConfiguration.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,6 @@
 ﻿
+using AuthAPI.Modules.Auth.DTOs;
+
 namespace AuthAPI.Services.IServices;
 
 public interface IAccountService
@@ -9,8 +11,4 @@ public interface IAccountService
     Task LogoutUserAsync();
     Task SendEmailConfirmationAsync(string email);
     Task<ProfileResponse> GetUserProfileByEmailAsync(string email);
-}
-
-public class RegisterRequest
-{
 }

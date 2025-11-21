@@ -1,5 +1,4 @@
 ﻿using AuthAPI.BackgroundService;
-using AuthAPI.Data;
 
 namespace AuthAPI.Extensions.ServiceCollectionExtensions;
 

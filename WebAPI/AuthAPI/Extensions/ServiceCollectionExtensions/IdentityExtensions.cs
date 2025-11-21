@@ -1,6 +1,4 @@
-﻿using AuthAPI.Data;
-using AuthAPI.Data.Role;
-using AuthAPI.Data.User;
+﻿using AuthAPI.Data.Models;
 
 namespace AuthAPI.Extensions.ServiceCollectionExtensions;
 
