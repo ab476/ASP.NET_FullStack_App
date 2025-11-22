@@ -5,7 +5,7 @@ using AuthAPI.Services.UserAddresses.Validators;
 using AuthAPI.Services.Users;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace AuthAPI.Features.UserAddresses;
+namespace AuthAPI.Services.UserAddresses;
 
 public static class UserAddressFeatureExtensions
 {

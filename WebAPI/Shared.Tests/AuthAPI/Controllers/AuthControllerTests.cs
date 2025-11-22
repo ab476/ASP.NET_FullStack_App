@@ -1,10 +1,11 @@
 ﻿using AuthAPI.Controllers;
+
 using System.Net.Http.Json;
 
-namespace Shared.Tests.AuthAPI.Tests.Controllers;
+namespace Shared.Tests.AuthAPI.Controllers;
 
 [Collection(TestConstants.Auth)]
-public class AuthControllerTests(AuthIntegrationTestContext context)
+public class AuthControllerTests(AuthTestContextFixture context)
 {
     private readonly HttpClient _client = context.Client;
 

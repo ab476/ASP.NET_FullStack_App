@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using AuthAPI.Data;
 
-namespace Shared.Tests.AuthAPI.Tests;
+namespace Shared.Tests.AuthAPI;
 
 public class AuthWebApplicationFactory(string connectionString) : WebApplicationFactory<Program>
 {

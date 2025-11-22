@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using System.Net.Mime;
 
-namespace Common.Features.DatabaseConfiguration;
+namespace Common.Features.DatabaseConfiguration.Endpoints;
 public static class DatabaseConfigurationEndpointExtensions
 {
     public static void MapDatabaseConfigurationEndpoints(this IEndpointRouteBuilder endpoints, DatabaseConfigurationOptions? options = null)

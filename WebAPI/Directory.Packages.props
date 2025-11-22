@@ -45,6 +45,8 @@
     <PackageVersion Include="NSwag.CodeGeneration.CSharp" Version="14.6.1" />
     <PackageVersion Include="NSwag.CodeGeneration.TypeScript" Version="14.6.1" />
     <!-- Test Framework -->
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.8.1" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.8.1" />
     <PackageVersion Include="xunit" Version="2.8.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.0" PrivateAssets="all" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />

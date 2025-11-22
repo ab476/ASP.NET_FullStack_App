@@ -1,8 +1,10 @@
 ﻿using AuthAPI.Endpoints;
 using AuthAPI.Extensions.ServiceCollectionExtensions;
-using AuthAPI.Features.UserAddresses;
 using AuthAPI.Services.Caching;
+using AuthAPI.Services.UserAddresses;
 using AuthAPI.Services.UserAddresses.Endpoints;
+using Common.Features.DatabaseConfiguration.Endpoints;
+using ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -24,7 +24,9 @@
 		<PackageReference Include="Microsoft.Playwright.Xunit" />
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
 		<PackageReference Include="Testcontainers" />
+		<PackageReference Include="Testcontainers.MsSql" />
 		<PackageReference Include="Testcontainers.MySql" />
+		<PackageReference Include="Testcontainers.PostgreSql" />
 		<PackageReference Include="xunit" />
 		<PackageReference Include="xunit.runner.visualstudio">
 			<PrivateAssets>all</PrivateAssets>

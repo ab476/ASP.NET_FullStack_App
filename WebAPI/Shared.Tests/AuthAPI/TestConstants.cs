@@ -1,4 +1,4 @@
-﻿namespace Shared.Tests.AuthAPI.Tests;
+﻿namespace Shared.Tests.AuthAPI;
 public static class TestConstants
 {
     public const string Auth = "AuthAPI";

@@ -3,6 +3,7 @@ using AuthAPI.Modules.Auth.Middleware;
 using AuthAPI.Modules.Auth.Repositories;
 using AuthAPI.Modules.Auth.Services;
 using AuthAPI.Modules.Auth.Settings;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AuthAPI.Modules.Auth;
 
@@ -19,9 +20,9 @@ public static class AuthModuleServiceCollectionExtensions
 
 
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-        services.AddScoped<RefreshTokenFactory>();
-        services.AddScoped<RefreshTokenValidator>();
-        services.AddScoped<AccessTokenFactory>();
+        services.TryAddSingleton<IRefreshTokenFactory, RefreshTokenFactory>();
+        services.TryAddScoped<IRefreshTokenValidator, RefreshTokenValidator>();
+        services.TryAddSingleton<IAccessTokenFactory ,AccessTokenFactory>();
         services.AddScoped<TokenService>(); // or ITokenService
         services.AddSingleton<IDomainEventPublisher, NoopDomainEventPublisher>();
 

@@ -1,4 +1,4 @@
-namespace Aspire.Tests.Tests;
+namespace Aspire.Tests;
 public class IntegrationTest1
 {
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);

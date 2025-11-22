@@ -14,7 +14,7 @@ namespace AuthAPI.Modules.Auth.Services;
 public class TokenService(
     UserManager<TUser> userManager,
     IRefreshTokenRepository repo,
-    AccessTokenFactory accessFactory,
+    IAccessTokenFactory accessFactory,
     RefreshTokenFactory refreshFactory,
     RefreshTokenValidator validator,
     IOptions<JwtSettings> jwtOptions,
@@ -79,7 +79,7 @@ public class TokenService(
     public async Task<AuthResponse?> RefreshAsync(string refreshTokenRaw, string? deviceId, string? fingerprint, string? ip = null, string? userAgent = null)
     {
         // compute hash using factory's HMAC
-        var hash = refreshFactory.ComputeHashForReceived(refreshTokenRaw);
+        var hash = refreshFactory.ComputeHash(refreshTokenRaw);
 
         var validated = await validator.ValidateForRefreshAsync(hash, deviceId, fingerprint, ip, userAgent);
         if (validated == null) return null;
@@ -123,5 +123,20 @@ public class TokenService(
         if (row == null) return;
         await repo.RevokeAsync(row.Id, reason);
         await events.PublishAsync("refresh_token.revoked", new { userId = row.UserId, tokenId = row.Id, reason });
+    }
+
+    public (string token, string hash) CreateRefreshToken()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<AuthResponse> CreateTokensForUserAsync(TUser user, string? deviceId, string? fingerprint)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<AuthResponse?> RefreshAsync(string refreshToken, string? deviceId, string? fingerprint)
+    {
+        throw new NotImplementedException();
     }
 }
