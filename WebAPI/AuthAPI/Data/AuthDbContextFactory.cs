@@ -1,14 +1,17 @@
-﻿namespace AuthAPI.Data;
+﻿using Common.Constants;
+using MySqlConnector;
 
-public class AuthDbContextFactory(IMultiDatabaseConfig _dbOptions)
+namespace AuthAPI.Data;
+
+public class AuthDbContextFactory(IMultiDatabaseConfig _dbOptions, [FromKeyedServices(ResourceNames.AuthDb)] MySqlDataSource authdb)
 {
 
     public void Configure(DbContextOptionsBuilder options)
     {
         options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
-        var activeDb = _dbOptions.ActiveDatabase;
-        var connStr = _dbOptions.GetActiveConnectionString();
+        var activeDb = DatabaseType.MySQL;// _dbOptions.ActiveDatabase;
+        var connStr = authdb.ConnectionString; // _dbOptions.GetActiveConnectionString();
 
         switch (activeDb)
         {

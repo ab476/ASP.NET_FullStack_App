@@ -6,8 +6,8 @@ public static class DatabaseExtensions
 {
     public static IServiceCollection AddDatabaseServices(this IServiceCollection services, IConfiguration configuration)
     {
-        if (!configuration.IsTestEnvironment())
-        {
+        //if (!configuration.IsTestEnvironment())
+        //{
             services.AddDbContextPool<AuthDbContext>((sp, options) =>
             {
                 var factory = sp.GetRequiredService<AuthDbContextFactory>();
@@ -15,7 +15,7 @@ public static class DatabaseExtensions
             });
 
             services.AddHostedService<InitializeDatabaseService>();
-        }
+        //}
 
 
         return services;

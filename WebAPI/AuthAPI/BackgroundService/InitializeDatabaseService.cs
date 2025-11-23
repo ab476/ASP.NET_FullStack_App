@@ -1,17 +1,14 @@
-﻿namespace AuthAPI.BackgroundService;
-
-using AuthAPI.Data;
-using AuthAPI.Data.Models;
+﻿using AuthAPI.Data.Models;
 using Common.Features.DatabaseConfiguration.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using AuthAPI.Extensions;
+
+namespace AuthAPI.BackgroundService;
 
 public class InitializeDatabaseService(
     IServiceScopeFactory scopeFactory,
     IHostEnvironment env,
-    ILogger<InitializeDatabaseService> logger
+    ILogger<InitializeDatabaseService> logger,
+    IConfiguration configuration
 ) : IHostedService
 {
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
@@ -57,7 +54,10 @@ public class InitializeDatabaseService(
     private async Task EnsureDatabaseCreatedAsync(DbContext dbContext, CancellationToken ct)
     {
         _logger.LogInformation("Ensuring database is created...");
-        //await dbContext.Database.EnsureDeletedAsync(ct);
+        if(configuration.IsTestEnvironment())
+        {
+            await dbContext.Database.EnsureDeletedAsync(ct);
+        }
         await dbContext.Database.EnsureCreatedAsync(ct);
     }
 

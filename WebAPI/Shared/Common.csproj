@@ -11,6 +11,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Aspire.MySqlConnector" />
 		<PackageReference Include="EFCore.NamingConventions" />
 		<PackageReference Include="FluentValidation" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
@@ -27,6 +28,7 @@
 		<PackageReference Include="NSwag.AspNetCore" />
 		<PackageReference Include="NSwag.CodeGeneration.CSharp" />
 		<PackageReference Include="NSwag.CodeGeneration.TypeScript" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
 		<PackageReference Include="Riok.Mapperly" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" />
 	</ItemGroup>

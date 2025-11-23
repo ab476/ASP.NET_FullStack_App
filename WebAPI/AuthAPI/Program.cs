@@ -3,6 +3,7 @@ using AuthAPI.Extensions.ServiceCollectionExtensions;
 using AuthAPI.Services.Caching;
 using AuthAPI.Services.UserAddresses;
 using AuthAPI.Services.UserAddresses.Endpoints;
+using Common.Constants;
 using Common.Features.DatabaseConfiguration.Endpoints;
 using ServiceDefaults;
 
@@ -11,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 
+builder.AddKeyedMySqlDataSource(name: ResourceNames.ConfigurationDb);
+builder.AddKeyedMySqlDataSource(name: ResourceNames.AuthDb);
 
 builder.AddServiceDefaults();
 // Host configuration
@@ -19,12 +22,12 @@ builder.Host.ConfigureDefaultServiceProvider(builder.Environment);
 configuration
     .AddDatabaseConfiguration(services, options =>
     {
-        options.ConfigureDbContext = dbOptions =>
-        {
-            var connectionString = configuration.GetConnectionString("ConfigurationDatabase");
-            dbOptions.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-            dbOptions.UseSnakeCaseNamingConvention(CultureInfo.CurrentCulture);
-        };
+        //options.ConfigureDbContext = dbOptions =>
+        //{
+        //    var connectionString = configuration.GetConnectionString("ConfigurationDatabase");
+        //    dbOptions.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        //    dbOptions.UseSnakeCaseNamingConvention(CultureInfo.CurrentCulture);
+        //};
     });
 
 // Service registration

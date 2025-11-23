@@ -1,22 +1,30 @@
+
+
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 // 1. Add the Redis resource
-var redisCache = builder.AddRedis("cache")
+var redisCache = builder.AddRedis(ResourceNames.Redis)
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent);
 
-var configurationDB = builder.AddMySql("configuration-db")
+var mysql = builder.AddMySql(ResourceNames.MySql)
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent)
-    .AddDatabase("ConfigurationDatabase")
-    ;
+    .WithPhpMyAdmin();
+
+var configurationDB = mysql.AddDatabase(ResourceNames.ConfigurationDb);
+var authDB = mysql.AddDatabase(ResourceNames.AuthDb);
+
 // Add API project
 var authApi = builder
     .AddProject<Projects.AuthAPI>("auth-api")
     .WithReference(configurationDB)
+    .WithReference(authDB)
     .WithReference(redisCache)
     .WaitFor(redisCache)
-    .WaitFor(configurationDB);
+    .WaitFor(configurationDB)
+    .WaitFor(authDB);
 
 // Next.js app
 var next = builder.AddNpmApp("webapp", "../NextJSWebApp", "dev")

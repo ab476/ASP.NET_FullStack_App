@@ -6,8 +6,7 @@ namespace AuthAPI.Modules.Auth.Services;
 public interface ITokenService
 {
     Task<string> GenerateAccessTokenAsync(TUser user);
-    (string token, string hash) CreateRefreshToken();
-    Task<AuthResponse> CreateTokensForUserAsync(TUser user, string? deviceId, string? fingerprint);
-    Task<AuthResponse?> RefreshAsync(string refreshToken, string? deviceId, string? fingerprint);
+    Task<AuthResponse> CreateTokensForUserAsync(TUser user, string? deviceId, string? fingerprint, string? ip = null, string? userAgent = null);
+    Task<AuthResponse?> RefreshAsync(string refreshToken, string? deviceId, string? fingerprint, string? ip = null, string? userAgent = null);
     Task RevokeRefreshTokenAsync(string refreshTokenHash, string? reason = null);
 }

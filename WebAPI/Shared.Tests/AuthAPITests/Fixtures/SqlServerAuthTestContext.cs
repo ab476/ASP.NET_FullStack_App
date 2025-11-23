@@ -1,19 +1,20 @@
-﻿using Testcontainers.PostgreSql;
+﻿using AuthAPI.Data;
+using Testcontainers.MsSql;
 
-namespace Shared.Tests.AuthAPI.Fixtures;
+namespace Shared.Tests.AuthAPITests.Fixtures;
 
-public class PostgreSqlAuthTestContext : IAuthTestContext
+public class SqlServerAuthTestContext : IAuthTestContext
 {
-    private readonly PostgreSqlContainer _container;
+    private readonly MsSqlContainer _container;
 
     public HttpClient Client { get; private set; } = default!;
     public AuthWebApplicationFactory Factory { get; private set; } = default!;
 
-    public PostgreSqlAuthTestContext()
+    public FakeTimeProvider TimeProvider => throw new NotImplementedException();
+
+    public SqlServerAuthTestContext()
     {
-        _container = new PostgreSqlBuilder()
-            .WithDatabase("AuthTestDb")
-            .WithUsername("postgres")
+        _container = new MsSqlBuilder()
             .WithPassword("Password123!")
             .WithReuse(true)
             .Build();
@@ -23,7 +24,7 @@ public class PostgreSqlAuthTestContext : IAuthTestContext
     {
         await _container.StartAsync();
 
-        Factory = new AuthWebApplicationFactory(_container.GetConnectionString());
+        Factory = new AuthWebApplicationFactory(_container.GetConnectionString(), "");
         Client = Factory.CreateClient();
     }
 
@@ -35,4 +36,10 @@ public class PostgreSqlAuthTestContext : IAuthTestContext
         Client.Dispose();
         Factory.Dispose();
     }
+
+    public AuthDbContext CreateDbContext()
+    {
+        throw new NotImplementedException();
+    }
 }
+

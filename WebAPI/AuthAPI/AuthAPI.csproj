@@ -10,6 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Aspire.MySqlConnector" />
 		<PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" />
 		<PackageReference Include="EFCore.NamingConventions" />
 		<PackageReference Include="FluentValidation" />

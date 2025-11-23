@@ -1,4 +1,5 @@
 ﻿
+using AuthAPI.Models;
 using AuthAPI.Modules.Auth.DTOs;
 
 namespace AuthAPI.Services.IServices;

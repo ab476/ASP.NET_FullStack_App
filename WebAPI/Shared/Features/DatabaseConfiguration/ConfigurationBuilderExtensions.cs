@@ -1,4 +1,7 @@
-﻿using Common.Features.DatabaseConfiguration.Provider;
+﻿using Common.Constants;
+using Common.Features.DatabaseConfiguration.Provider;
+using MySqlConnector;
+using System.Globalization;
 
 namespace Common.Features.DatabaseConfiguration;
 
@@ -28,12 +31,17 @@ public static class ConfigurationBuilderExtensions
             options.EnablePooling);
 
         var configuration = tempProvider.GetRequiredService<IConfiguration>();
-
         logger.LogInformation("Configuring DbContextFactory for configuration store.");
 
-        services.AddPooledDbContextFactory<ConfigurationDbContext>(dbOptions =>
+        services.AddPooledDbContextFactory<ConfigurationDbContext>((sp, dbOptions) =>
         {
-            dbOptions.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            var configDb = sp.GetRequiredKeyedService<MySqlDataSource>(ResourceNames.ConfigurationDb);
+            var connectionString = configDb.ConnectionString;
+
+            dbOptions
+                .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+                .UseSnakeCaseNamingConvention(CultureInfo.CurrentCulture)
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             options.ConfigureDbContext?.Invoke(dbOptions);
 
             if(dbOptions.IsConfigured)

@@ -1,6 +1,5 @@
 ﻿using Common.Features.DatabaseConfiguration.Data;
 using Common.Features.NameHelper;
-using Microsoft.EntityFrameworkCore;
 using Testcontainers.MySql;
 
 namespace Shared.Tests.Common.Features.DatabaseConfiguration;

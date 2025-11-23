@@ -1,6 +1,5 @@
 ﻿
 global using AuthAPI.Data;
-global using AuthAPI.Models;
 global using AuthAPI.Services.IServices;
 global using Common.Configurations;
 global using Common.Extensions;
@@ -17,6 +16,5 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.IdentityModel.Tokens;
 global using System.ComponentModel.DataAnnotations;
 // Framework common
-global using System.Globalization;
 global using System.Net.Mime;
 global using System.Text;

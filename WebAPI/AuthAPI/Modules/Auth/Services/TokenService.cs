@@ -124,19 +124,4 @@ public class TokenService(
         await repo.RevokeAsync(row.Id, reason);
         await events.PublishAsync("refresh_token.revoked", new { userId = row.UserId, tokenId = row.Id, reason });
     }
-
-    public (string token, string hash) CreateRefreshToken()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<AuthResponse> CreateTokensForUserAsync(TUser user, string? deviceId, string? fingerprint)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<AuthResponse?> RefreshAsync(string refreshToken, string? deviceId, string? fingerprint)
-    {
-        throw new NotImplementedException();
-    }
 }

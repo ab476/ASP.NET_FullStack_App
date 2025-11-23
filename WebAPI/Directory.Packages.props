@@ -8,8 +8,10 @@
     <PackageVersion Include="Aspire.Hosting.MySql" Version="9.5.2" />
     <PackageVersion Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
     <PackageVersion Include="Aspire.Hosting.Redis" Version="9.5.0" />
+    <PackageVersion Include="Aspire.MySqlConnector" Version="9.5.2" />
     <PackageVersion Include="Aspire.StackExchange.Redis.DistributedCaching" Version="9.5.0" />
     <PackageVersion Include="CommunityToolkit.Aspire.Hosting.MySql.Extensions" Version="9.5.0" />
+    <PackageVersion Include="FluentBuilder" Version="0.13.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />

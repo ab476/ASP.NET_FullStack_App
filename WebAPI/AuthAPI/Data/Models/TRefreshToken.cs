@@ -7,7 +7,7 @@ public class TRefreshToken
     public Guid UserId { get; set; }
     public TUser User { get; set; } = null!;
 
-    public required string TokenHash { get; set; }
+    public string TokenHash { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public DateTime ExpiresAt { get; set; }
 

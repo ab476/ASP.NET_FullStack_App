@@ -1,8 +1,7 @@
 ﻿using AuthAPI.Controllers;
-
 using System.Net.Http.Json;
 
-namespace Shared.Tests.AuthAPI.Controllers;
+namespace Shared.Tests.AuthAPITests.Controllers;
 
 [Collection(TestConstants.Auth)]
 public class AuthControllerTests(AuthTestContextFixture context)

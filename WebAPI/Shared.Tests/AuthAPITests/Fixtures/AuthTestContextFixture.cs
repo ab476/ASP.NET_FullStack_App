@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AuthAPI.Data;
 
-namespace Shared.Tests.AuthAPI.Fixtures;
+namespace Shared.Tests.AuthAPITests.Fixtures;
 
 public class AuthTestContextFixture : IAuthTestContext
 {
@@ -26,7 +22,11 @@ public class AuthTestContextFixture : IAuthTestContext
     public HttpClient Client => _impl.Client;
     public AuthWebApplicationFactory Factory => _impl.Factory;
 
+    public FakeTimeProvider TimeProvider => _impl.TimeProvider;
+
     public Task InitializeAsync() => _impl.InitializeAsync();
     public Task DisposeAsync() => _impl.DisposeAsync();
+
+    public AuthDbContext CreateDbContext() => _impl.CreateDbContext();
 }
 
