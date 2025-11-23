@@ -1,4 +1,5 @@
-﻿using AuthAPI.Modules.Auth.Settings;
+﻿using AuthAPI.Modules.Auth.Models;
+using AuthAPI.Modules.Auth.Settings;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -38,7 +39,7 @@ public class AccessTokenFactory : IAccessTokenFactory
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 
             // Frontend convenience claim (many JavaScript apps prefer this)
-            new("exp_unix", ToUnixEpoch(expires).ToString(), ClaimValueTypes.Integer64)
+            new(JwtClaimTypes.ExpUnix, ToUnixEpoch(expires).ToString(), ClaimValueTypes.Integer64)
         };
 
         var claimIdentity = new ClaimsIdentity(standardClaims.Concat(customClaims));
@@ -48,7 +49,10 @@ public class AccessTokenFactory : IAccessTokenFactory
             Subject = claimIdentity,
             Issuer = _jwt.Issuer,
             Audience = _jwt.Audience,
-            SigningCredentials = _creds
+            SigningCredentials = _creds,
+            IssuedAt = now,
+            NotBefore = now,
+            Expires = expires
         };
 
         var token = _tokenHandler.CreateToken(descriptor);
