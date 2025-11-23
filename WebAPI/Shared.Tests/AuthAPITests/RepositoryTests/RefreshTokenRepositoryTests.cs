@@ -3,7 +3,7 @@ using AuthAPI.Data.Models;
 using AuthAPI.Modules.Auth.Repositories;
 using Shared.Tests.AuthAPITests.Builders;
 
-namespace Shared.Tests.AuthAPITests.Repositories;
+namespace Shared.Tests.AuthAPITests.RepositoryTests;
 
 [Collection(TestConstants.Auth)]
 public class RefreshTokenRepositoryTests(AuthTestContextFixture _fixture)
