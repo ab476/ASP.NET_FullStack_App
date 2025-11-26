@@ -1,4 +1,8 @@
-﻿namespace AuthAPI.Extensions.ServiceCollectionExtensions;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Options;
+using Scalar.AspNetCore;
+
+namespace AuthAPI.Extensions.ServiceCollectionExtensions;
 
 public static class SwaggerExtensions
 {
@@ -7,7 +11,7 @@ public static class SwaggerExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
-            options.OperationAsyncFilter<ApiActionResultOperationFilter>();
+            //options.OperationAsyncFilter<ApiActionResultOperationFilter>();
         });
 
         return services;
@@ -17,12 +21,7 @@ public static class SwaggerExtensions
     {
         if (!env.IsDevelopment())
             return;
-
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "AuthAPI v1");
-            c.RoutePrefix = string.Empty;
-        });
+        app.MapOpenApi();
+        app.MapScalarApiReference();
     }
 }

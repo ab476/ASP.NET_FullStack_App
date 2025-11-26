@@ -6,7 +6,7 @@ global using Common.Extensions;
 global using Common.Features.DatabaseConfiguration;
 global using Common.Infrastructure.Time;
 // Common libraries
-global using Common.Swagger;
+global using Common;
 global using FluentValidation;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Identity;

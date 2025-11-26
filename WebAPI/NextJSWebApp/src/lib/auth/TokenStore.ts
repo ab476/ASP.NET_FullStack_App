@@ -17,6 +17,7 @@ export class TokenStore {
 
     // Listen to token updates from other tabs
     authEvents.subscribe((event: AuthEvent) => {
+      debugger;
       switch (event.type) {
         case "TOKEN_UPDATED":
           this.setToken(event.token, { broadcast: false });
@@ -37,7 +38,7 @@ export class TokenStore {
   /** Set token and sync across tabs */
   setToken(token: string | null, opts: { broadcast?: boolean } = {}) {
     this.token = token;
-
+    debugger
     if (typeof window !== "undefined" && this.persistSession) {
       if (token) sessionStorage.setItem(this.storageKey, token);
       else sessionStorage.removeItem(this.storageKey);

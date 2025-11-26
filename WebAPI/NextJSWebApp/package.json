@@ -10,11 +10,13 @@
     "tailwind:init": "tailwindcss init -p"
   },
   "dependencies": {
+    "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fingerprintjs/fingerprintjs": "^5.0.1",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
+    "@mui/material-nextjs": "^7.3.5",
     "axios": "^1.13.2",
     "d3": "^7.9.0",
     "next": "15.5.3",

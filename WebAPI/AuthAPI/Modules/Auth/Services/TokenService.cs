@@ -15,8 +15,8 @@ public class TokenService(
     UserManager<TUser> userManager,
     IRefreshTokenRepository repo,
     IAccessTokenFactory accessFactory,
-    RefreshTokenFactory refreshFactory,
-    RefreshTokenValidator validator,
+    IRefreshTokenFactory refreshFactory,
+    IRefreshTokenValidator validator,
     IOptions<JwtSettings> jwtOptions,
     IOptions<RefreshTokenSettings> rtOptions,
     ITimeProvider clock,
@@ -61,7 +61,7 @@ public class TokenService(
         return accessFactory.CreateToken(claims);
     }
 
-    public async Task<AuthResponse> CreateTokensForUserAsync(TUser user, string? deviceId, string? fingerprint, string? ip = null, string? userAgent = null)
+    public async Task<LoginResponse> CreateTokensForUserAsync(TUser user, string? deviceId, string? fingerprint, string? ip = null, string? userAgent = null)
     {
         var accessToken = await GenerateAccessTokenAsync(user);
         var pair = refreshFactory.CreatePair();
@@ -73,10 +73,10 @@ public class TokenService(
         // publish event
         await events.PublishAsync("refresh_token.created", new { userId = user.Id, tokenId = rtEntity.Id });
 
-        return new AuthResponse(accessToken, pair.RawToken, _jwtSettings.AccessTokenMinutes * 60);
+        return new LoginResponse(accessToken, pair.RawToken, _jwtSettings.AccessTokenMinutes * 60);
     }
 
-    public async Task<AuthResponse?> RefreshAsync(string refreshTokenRaw, string? deviceId, string? fingerprint, string? ip = null, string? userAgent = null)
+    public async Task<LoginResponse?> RefreshAsync(string refreshTokenRaw, string? deviceId, string? fingerprint, string? ip = null, string? userAgent = null)
     {
         // compute hash using factory's HMAC
         var hash = refreshFactory.ComputeHash(refreshTokenRaw);
@@ -114,7 +114,7 @@ public class TokenService(
 
         await events.PublishAsync("refresh_token.rotated", new { userId = row.UserId, oldId = row.Id, newId = newRow.Id });
 
-        return new AuthResponse(newAccess, pair.RawToken, _jwtSettings.AccessTokenMinutes * 60);
+        return new LoginResponse(newAccess, pair.RawToken, _jwtSettings.AccessTokenMinutes * 60);
     }
 
     public async Task RevokeRefreshTokenAsync(string refreshTokenHash, string? reason = null)

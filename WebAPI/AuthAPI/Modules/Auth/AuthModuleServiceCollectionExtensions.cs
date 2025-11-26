@@ -1,8 +1,11 @@
-﻿using AuthAPI.Modules.Auth.Infrastructure;
+﻿using AuthAPI.Data.Models;
+using AuthAPI.Modules.Auth.Infrastructure;
 using AuthAPI.Modules.Auth.Middleware;
 using AuthAPI.Modules.Auth.Repositories;
 using AuthAPI.Modules.Auth.Services;
 using AuthAPI.Modules.Auth.Settings;
+using AuthAPI.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AuthAPI.Modules.Auth;
@@ -23,9 +26,9 @@ public static class AuthModuleServiceCollectionExtensions
         services.TryAddSingleton<IRefreshTokenFactory, RefreshTokenFactory>();
         services.TryAddScoped<IRefreshTokenValidator, RefreshTokenValidator>();
         services.TryAddSingleton<IAccessTokenFactory ,AccessTokenFactory>();
-        services.AddScoped<TokenService>(); // or ITokenService
+        services.AddScoped<ITokenService, TokenService>(); // or ITokenService
         services.AddSingleton<IDomainEventPublisher, NoopDomainEventPublisher>();
-
+        services.TryAddScoped<IEmailSender<TUser>, EmailSender>();
         // Identity assumed configured elsewhere
         return services;
     }

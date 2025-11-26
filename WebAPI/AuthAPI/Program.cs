@@ -1,5 +1,7 @@
 ﻿using AuthAPI.Endpoints;
 using AuthAPI.Extensions.ServiceCollectionExtensions;
+using AuthAPI.Modules.Auth;
+using AuthAPI.Modules.Auth.Endpoints;
 using AuthAPI.Services.Caching;
 using AuthAPI.Services.UserAddresses;
 using AuthAPI.Services.UserAddresses.Endpoints;
@@ -39,8 +41,10 @@ services.AddSwaggerDocumentation()
     .AddValidationServices()
     .AddAuthenticationServices(configuration)
     .AddControllerServices()
-    .AddRedisDistributedCache(builder);
-
+    .AddRedisDistributedCache(builder)
+    .AddAuthModule(configuration)
+    .AddOpenApi()
+    .AddEndpointsApiExplorer();
 services.AddUserAddressFeature();
 
 var app = builder.Build();
@@ -55,6 +59,7 @@ app.UseAuthorization();
 app.MapControllers();
 app
     .MapUserAddressEndpoints()
+    .MapAuthEndpoints()
     .MapGlobalErrorEndpoint()
     .MapKeyGenEndpoints()
     .MapDatabaseConfigurationEndpoints();

@@ -1,6 +1,7 @@
 ﻿using AuthAPI.Data.Models;
 using Common.Features.DatabaseConfiguration.Data;
 using AuthAPI.Extensions;
+using AuthAPI.Helper;
 
 namespace AuthAPI.BackgroundService;
 
@@ -17,7 +18,7 @@ public class InitializeDatabaseService(
 
     private const string AdminEmail = "admin@example.com";
     private const string MemberEmail = "member@example.com";
-    private const string AdminRole = "Admin";
+    private const string AdminRole = UserRoles.Admin;
     private const string DefaultPassword = "passWord@#3";
 
     public async Task StartAsync(CancellationToken cancellationToken)

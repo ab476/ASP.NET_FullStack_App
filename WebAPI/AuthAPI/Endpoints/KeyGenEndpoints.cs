@@ -7,15 +7,14 @@ public static class KeyGenEndpoints
 {
     public static IEndpointRouteBuilder MapKeyGenEndpoints(this IEndpointRouteBuilder app)
     {
+        var env = app.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+        if(!env.IsDevelopment())
+        {
+            return app;
+        }
+
         var group = app.MapGroup("/api/keygen")
             .WithTags("KeyGen");
-
-        var env = app.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
-
-        if (env.IsDevelopment())
-            group.AllowAnonymous();
-        else
-            group.RequireAuthorization(policy => policy.RequireRole("admin"));
 
         group.MapGet("/", ([AsParameters] KeyGenRequest request, [FromServices] ITimeProvider timeProvider) =>
         {

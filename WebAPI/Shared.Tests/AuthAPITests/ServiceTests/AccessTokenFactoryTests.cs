@@ -1,4 +1,5 @@
-﻿using AuthAPI.Modules.Auth.Models;
+﻿using AuthAPI.Helper;
+using AuthAPI.Modules.Auth.Models;
 using AuthAPI.Modules.Auth.Services;
 using AuthAPI.Modules.Auth.Settings;
 using Microsoft.Extensions.Options;
@@ -42,7 +43,7 @@ public class AccessTokenFactoryTests
         var now = _clock.UtcNow;
         var expectedExp = now.AddMinutes(15);
 
-        var customClaims = new[] { new Claim("role", "admin") };
+        var customClaims = new[] { new Claim(ClaimTypes.Role, UserRoles.Admin) };
 
         // Act
         var tokenString = factory.CreateToken(customClaims);
@@ -73,7 +74,7 @@ public class AccessTokenFactoryTests
         jwt.Claims.Should().Contain(c => c.Type == JwtRegisteredClaimNames.Jti);
 
         // Custom claim still appears
-        jwt.Claims.Should().ContainSingle(c => c.Type == "role" && c.Value == "admin");
+        jwt.Claims.Should().ContainSingle(c => c.Type == ClaimTypes.Role && c.Value == UserRoles.Admin);
     }
 
 
