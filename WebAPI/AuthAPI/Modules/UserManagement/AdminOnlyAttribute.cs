@@ -3,13 +3,16 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AuthAPI.Modules.UserManagement;
 
+/// <summary>
+/// Restricts access to Admin users only.
+/// </summary>
 public sealed class AdminOnlyAttribute : AuthorizeAttribute
 {
-    public const string PolicyName = "AdminOnly";
+    public const string PolicyName = "Policy.Admin.Only";
 
     public AdminOnlyAttribute()
     {
-        Policy = PolicyName;
+        Policy = PolicyName ?? throw new InvalidOperationException("Policy name cannot be null.");
     }
 }
 
@@ -19,11 +22,16 @@ public static class AddAdminOnlyPolicyExtensions
     {
         authorizationBuilder
             .AddPolicy(AdminOnlyAttribute.PolicyName, policy =>
-                policy.RequireRole(UserRoles.Admin));
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireRole(UserRoles.Admin);
+            });
 
         return authorizationBuilder;
     }
 
-    public static RouteGroupBuilder RequireAdmin(this RouteGroupBuilder group) =>
-       group.RequireAuthorization(AdminOnlyAttribute.PolicyName);
+    public static RouteGroupBuilder RequireAdmin(this RouteGroupBuilder group)
+    {
+        return group.RequireAuthorization(AdminOnlyAttribute.PolicyName);
+    }
 }

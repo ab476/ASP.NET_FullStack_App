@@ -1,5 +1,4 @@
 ﻿using AuthAPI.Data.Models;
-using AuthAPI.Modules.Auth.Infrastructure;
 using AuthAPI.Modules.Auth.Middleware;
 using AuthAPI.Modules.Auth.Repositories;
 using AuthAPI.Modules.Auth.Services;
@@ -15,7 +14,6 @@ public static class AuthModuleServiceCollectionExtensions
     public static IServiceCollection AddAuthModule(this IServiceCollection services, IConfiguration config)
     {
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IFeatureFlagService, FeatureFlagService>();
         services.AddScoped<ITenantResolver, TenantResolver>();
 
         services.Configure<JwtSettings>(config.GetSection("Jwt"));
@@ -27,7 +25,6 @@ public static class AuthModuleServiceCollectionExtensions
         services.TryAddScoped<IRefreshTokenValidator, RefreshTokenValidator>();
         services.TryAddSingleton<IAccessTokenFactory ,AccessTokenFactory>();
         services.AddScoped<ITokenService, TokenService>(); // or ITokenService
-        services.AddSingleton<IDomainEventPublisher, NoopDomainEventPublisher>();
         services.TryAddScoped<IEmailSender<TUser>, EmailSender>();
         // Identity assumed configured elsewhere
         return services;

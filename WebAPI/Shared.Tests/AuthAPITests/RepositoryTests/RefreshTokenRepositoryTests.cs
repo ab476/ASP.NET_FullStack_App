@@ -45,7 +45,7 @@ public class RefreshTokenRepositoryTests(AuthTestContextFixture _fixture)
         db.TRefreshTokens.Add(token);
         await db.SaveChangesAsync();
 
-        var result = await repo.GetByHashAsync("abc123");
+        var result = await repo.GetByHashAsync("abc123", default);
 
         result.Should().NotBeNull();
         result!.TokenHash.Should().Be("abc123");
@@ -57,7 +57,7 @@ public class RefreshTokenRepositoryTests(AuthTestContextFixture _fixture)
         using var db = _fixture.CreateDbContext();
         var repo = CreateRepository(db);
 
-        var result = await repo.GetByHashAsync("missing");
+        var result = await repo.GetByHashAsync("missing", default);
 
         result.Should().BeNull();
     }
@@ -88,7 +88,7 @@ public class RefreshTokenRepositoryTests(AuthTestContextFixture _fixture)
         db.TRefreshTokens.AddRange(active, revoked);
         await db.SaveChangesAsync();
 
-        var result = await repo.GetActiveForUserAsync(user.Id);
+        var result = await repo.GetActiveForUserAsync(user.Id, default);
 
         result.Should().ContainSingle()
               .Which.TokenHash.Should().Be("active");
@@ -106,8 +106,7 @@ public class RefreshTokenRepositoryTests(AuthTestContextFixture _fixture)
             .WithTokenHash("newtoken")
             .Build();
 
-        await repo.AddAsync(token);
-        await repo.SaveChangesAsync();
+        await repo.AddAsync(token, default);
 
         var exists = await db.TRefreshTokens
             .AsNoTracking()
@@ -134,7 +133,7 @@ public class RefreshTokenRepositoryTests(AuthTestContextFixture _fixture)
         db.TRefreshTokens.Add(token);
         await db.SaveChangesAsync();
 
-        var result = await repo.RevokeAsync(tokenId, "test-reason");
+        var result = await repo.RevokeAsync(tokenId, "test-reason", null, default);
 
         result.Should().BeTrue();
 
@@ -166,7 +165,7 @@ public class RefreshTokenRepositoryTests(AuthTestContextFixture _fixture)
         db.TRefreshTokens.Add(token);
         await db.SaveChangesAsync();
 
-        var result = await repo.RevokeByHashAsync("hash123");
+        var result = await repo.RevokeAsync("hash123", "RevokeByHashAsync_RevokesToken", null, default);
 
         result.Should().BeTrue();
 
@@ -203,7 +202,7 @@ public class RefreshTokenRepositoryTests(AuthTestContextFixture _fixture)
         db.TRefreshTokens.AddRange(t1, t2);
         await db.SaveChangesAsync();
 
-        var count = await repo.RevokeAllForUserAsync(user.Id, "mass-revoke");
+        var count = await repo.RevokeAllForUserAsync(user.Id, "mass-revoke", default);
 
         count.Should().Be(1);
 

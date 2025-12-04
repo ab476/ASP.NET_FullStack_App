@@ -11,7 +11,7 @@ public class RefreshTokenRepository(AuthDbContext _db, ITimeProvider _clock) : I
 
     // ---------- Getters ----------
 
-    public Task<TRefreshToken?> GetByHashAsync(string tokenHash, CancellationToken ct = default)
+    public Task<TRefreshToken?> GetByHashAsync(string tokenHash, CancellationToken ct)
         => TRefreshTokens
             .AsNoTracking()
             .TagWith("RefreshToken.GetByHash")
@@ -19,7 +19,7 @@ public class RefreshTokenRepository(AuthDbContext _db, ITimeProvider _clock) : I
             .Where(r => r.TokenHash == tokenHash)
             .FirstOrDefaultAsync(ct);
 
-    public Task<List<TRefreshToken>> GetActiveForUserAsync(Guid userId, CancellationToken ct = default)
+    public Task<List<TRefreshToken>> GetActiveForUserAsync(Guid userId, CancellationToken ct)
         => ActiveTRefreshTokens
             .AsNoTracking()
             .TagWith("RefreshToken.GetActiveForUser")
@@ -29,13 +29,11 @@ public class RefreshTokenRepository(AuthDbContext _db, ITimeProvider _clock) : I
 
     // ---------- Add / Save ----------
 
-    public async Task AddAsync(TRefreshToken token, CancellationToken ct = default)
+    public async Task AddAsync(TRefreshToken token, CancellationToken ct)
     {
         await _db.TRefreshTokens.AddAsync(token, ct);
+        await _db.SaveChangesAsync(ct);
     }
-
-    public Task SaveChangesAsync(CancellationToken ct = default)
-        => _db.SaveChangesAsync(ct);
 
     // ---------- Internal Revoke Helpers ----------
 
@@ -44,6 +42,7 @@ public class RefreshTokenRepository(AuthDbContext _db, ITimeProvider _clock) : I
         string tag,
         string detail,
         string? reason,
+        Guid? replacedByTokenId,
         CancellationToken ct)
     {
         var now = _clock.UtcNow;
@@ -55,28 +54,29 @@ public class RefreshTokenRepository(AuthDbContext _db, ITimeProvider _clock) : I
             .ExecuteUpdateAsync(s => s
                 .SetProperty(r => r.Revoked, true)
                 .SetProperty(r => r.RevokedAt, now)
-                .SetProperty(r => r.RevokedReason, reason),
+                .SetProperty(r => r.RevokedReason, reason)
+                .SetProperty(r => r.ReplacedByTokenId, replacedByTokenId),
                 ct
             );
     }
 
     // ---------- Public Revocation API ----------
 
-    public async Task<bool> RevokeAsync(Guid refreshTokenId, string? reason = null, CancellationToken ct = default)
+    public async Task<bool> RevokeAsync(Guid refreshTokenId, string reason, Guid? replacedByTokenId, CancellationToken ct)
     {
         var q = TRefreshTokens.Where(r => r.Id == refreshTokenId);
-        return await RevokeInternalAsync(q, "RefreshToken.RevokeById", $"Id={refreshTokenId}", reason, ct) > 0;
+        return await RevokeInternalAsync(q, "RefreshToken.RevokeById", $"Id={refreshTokenId}", reason, replacedByTokenId, ct) > 0;
     }
 
-    public async Task<bool> RevokeByHashAsync(string tokenHash, string? reason = null, CancellationToken ct = default)
+    public async Task<bool> RevokeAsync(string tokenHash, string reason, Guid? replacedByTokenId, CancellationToken ct)
     {
         var q = TRefreshTokens.Where(r => r.TokenHash == tokenHash);
-        return await RevokeInternalAsync(q, "RefreshToken.RevokeByHash", $"Hash={tokenHash}", reason, ct) > 0;
+        return await RevokeInternalAsync(q, "RefreshToken.RevokeByHash", $"Hash={tokenHash}", reason, replacedByTokenId, ct) > 0;
     }
 
-    public Task<int> RevokeAllForUserAsync(Guid userId, string reason, CancellationToken ct = default)
+    public Task<int> RevokeAllForUserAsync(Guid userId, string reason, CancellationToken ct)
     {
-        var q = ActiveTRefreshTokens.Where(r => r.UserId == userId);
-        return RevokeInternalAsync(q, "RefreshToken.RevokeAllForUser", $"UserId={userId}", reason, ct);
+        var query = ActiveTRefreshTokens.Where(r => r.UserId == userId);
+        return RevokeInternalAsync(query, "RefreshToken.RevokeAllForUser", $"UserId={userId}", reason, null, ct);
     }
 }

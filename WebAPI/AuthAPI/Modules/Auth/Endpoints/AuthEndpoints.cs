@@ -52,7 +52,8 @@ public static class AuthEndpoints
                 LoginRequest req,
                 UserManager<TUser> userManager,
                 SignInManager<TUser> signInManager,
-                ITokenService tokenService) =>
+                ITokenService tokenService,
+                CancellationToken ct) =>
             {
                 var user = await userManager.FindByEmailAsync(req.Email);
                 if (user == null)
@@ -62,7 +63,7 @@ public static class AuthEndpoints
                 if (!signIn.Succeeded)
                     return TypedResults.Unauthorized();
 
-                var tokens = await tokenService.CreateTokensForUserAsync(user, req.DeviceId, req.Fingerprint);
+                var tokens = await tokenService.CreateTokensForUserAsync(user, req.DeviceId, req.Fingerprint, ct);
 
                 http.Response.Cookies.Append("refresh_token", tokens.RefreshToken, new CookieOptions
                 {
@@ -83,13 +84,14 @@ public static class AuthEndpoints
             (
                 HttpContext http,
                 RefreshRequest req,
-                ITokenService tokenService) =>
+                ITokenService tokenService,
+                CancellationToken ct) =>
             {
                 var rt = req.RefreshToken ?? http.Request.Cookies["refresh_token"];
                 if (string.IsNullOrEmpty(rt))
                     return TypedResults.BadRequest("No refresh token provided");
 
-                var result = await tokenService.RefreshAsync(rt, req.DeviceId, req.Fingerprint);
+                var result = await tokenService.RefreshAsync(rt, req.DeviceId, req.Fingerprint, ct);
                 if (result == null)
                     return TypedResults.Unauthorized();
 
@@ -111,7 +113,8 @@ public static class AuthEndpoints
             [Authorize] async Task<Results<Ok, UnauthorizedHttpResult>>
             (HttpContext http,
              ClaimsPrincipal user,
-             ITokenService tokenService) =>
+             ITokenService tokenService,
+             CancellationToken ct) =>
             {
                 var userId = user.FindFirstValue(JwtRegisteredClaimNames.Sub);
                 if (userId == null)
@@ -124,7 +127,7 @@ public static class AuthEndpoints
                         SHA256.HashData(Encoding.UTF8.GetBytes(cookie))
                     );
 
-                    await tokenService.RevokeRefreshTokenAsync(hash, "logout");
+                    await tokenService.RevokeRefreshTokenAsync(hash, "logout", null, ct);
                 }
 
                 http.Response.Cookies.Delete("refresh_token");
@@ -225,7 +228,7 @@ public static class AuthEndpoints
                 MagicLinkConsumeRequest req,
                 UserManager<TUser> userManager,
                 SignInManager<TUser> signInManager,
-                ITokenService tokenService) =>
+                ITokenService tokenService, CancellationToken ct) =>
             {
                 var user = await userManager.FindByIdAsync(req.UserId);
                 if (user == null) return TypedResults.NotFound();
@@ -235,7 +238,7 @@ public static class AuthEndpoints
 
                 // optionally: perform any checks (is email confirmed, tenant checks, etc)
                 // sign in user (or skip persistent sign-in and return tokens)
-                var tokens = await tokenService.CreateTokensForUserAsync(user, req.DeviceId, req.Fingerprint);
+                var tokens = await tokenService.CreateTokensForUserAsync(user, req.DeviceId, req.Fingerprint, ct);
 
                 return TypedResults.Ok(tokens with { RefreshToken = "(in cookie)" });
             })

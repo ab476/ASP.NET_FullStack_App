@@ -7,6 +7,9 @@ public static class ResourceNames
     // Containers
     public const string Redis = "redis-cache";
     public const string MySql = "mysql-server";
+    public const string SqlServer = "sql-server";
+    public const string Postgres = "postgres-server";
+    public const string Oracle = "oracle-server";
 
     // Databases
     public const string ConfigurationDb = "config-db";

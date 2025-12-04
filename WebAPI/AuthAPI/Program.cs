@@ -14,8 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 
-builder.AddKeyedMySqlDataSource(name: ResourceNames.ConfigurationDb);
-builder.AddKeyedMySqlDataSource(name: ResourceNames.AuthDb);
+builder.AddKeyedSqlServerClient(name: ResourceNames.ConfigurationDb);
+builder.AddKeyedSqlServerClient(name: ResourceNames.AuthDb);
 
 builder.AddServiceDefaults();
 // Host configuration

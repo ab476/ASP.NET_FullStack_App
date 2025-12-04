@@ -11,6 +11,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Aspire.Hosting.AppHost" />
+		<PackageReference Include="Aspire.Microsoft.Data.SqlClient" />
 		<PackageReference Include="Aspire.MySqlConnector" />
 		<PackageReference Include="EFCore.NamingConventions" />
 		<PackageReference Include="FluentValidation" />

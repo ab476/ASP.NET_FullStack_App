@@ -1,36 +1,35 @@
 
 
 
-var builder = DistributedApplication.CreateBuilder(args);
+using AppHost.Resources.Database;
+using Microsoft.Extensions.Configuration;
 
+var builder = DistributedApplication.CreateBuilder(args);
 // 1. Add the Redis resource
 var redisCache = builder.AddRedis(ResourceNames.Redis)
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent);
 
-var mysql = builder.AddMySql(ResourceNames.MySql)
-    .WithDataVolume()
-    .WithLifetime(ContainerLifetime.Persistent)
-    .WithPhpMyAdmin();
+// 2. database Server
 
-var configurationDB = mysql.AddDatabase(ResourceNames.ConfigurationDb);
-var authDB = mysql.AddDatabase(ResourceNames.AuthDb);
-
+var (dbOptions, _, configurationDb, authDb) = builder.ConfigureDatabaseContainers();
 // Add API project
 var authApi = builder
     .AddProject<Projects.AuthAPI>("auth-api")
-    .WithReference(configurationDB)
-    .WithReference(authDB)
+    .WithEnvironment($"{DatabaseOptions.Database}__{nameof(DatabaseOptions.Provider)}", dbOptions.Provider.ToString())
+    .WithReference(configurationDb)
+    .WithReference(authDb)
     .WithReference(redisCache)
     .WaitFor(redisCache)
-    .WaitFor(configurationDB)
-    .WaitFor(authDB);
+    .WaitFor(configurationDb)
+    .WaitFor(authDb);
 
 // Next.js app
-var next = builder.AddNpmApp("webapp", "../NextJSWebApp", "dev")
+var next = builder.AddNpmApp("next-app", "../NextJSWebApp", "dev")
                   .WithHttpEndpoint(env: "PORT")
                   .WithReference(authApi)
-                  .PublishAsDockerFile(); // Next.js uses PORT env
+                  .PublishAsDockerFile();
+                  //.WithOtlpExporter(OtlpProtocol.HttpProtobuf); // Next.js uses PORT env
 
 
 builder.Build().Run();
