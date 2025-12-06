@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Options;
-using Scalar.AspNetCore;
+﻿using Scalar.AspNetCore;
 
 namespace AuthAPI.Extensions.ServiceCollectionExtensions;
 

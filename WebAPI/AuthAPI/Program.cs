@@ -21,16 +21,6 @@ builder.AddServiceDefaults();
 // Host configuration
 builder.Host.ConfigureDefaultServiceProvider(builder.Environment);
 
-configuration
-    .AddDatabaseConfiguration(services, options =>
-    {
-        //options.ConfigureDbContext = dbOptions =>
-        //{
-        //    var connectionString = configuration.GetConnectionString("ConfigurationDatabase");
-        //    dbOptions.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        //    dbOptions.UseSnakeCaseNamingConvention(CultureInfo.CurrentCulture);
-        //};
-    });
 
 // Service registration
 services.AddSwaggerDocumentation()

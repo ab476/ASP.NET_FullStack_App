@@ -4,7 +4,6 @@ using AuthAPI.Modules.Auth.Repositories;
 using AuthAPI.Modules.Auth.Services;
 using AuthAPI.Modules.Auth.Settings;
 using AuthAPI.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace AuthAPI.Modules.Auth;

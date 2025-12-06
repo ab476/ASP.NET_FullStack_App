@@ -1,24 +1,41 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Primitives;
+﻿using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Common.Features.DatabaseConfiguration.Provider;
 
 public sealed class DatabaseConfigurationProvider(
     IDbContextFactory<ConfigurationDbContext> dbFactory,
-    ILogger<DatabaseConfigurationProvider> _logger,
-    IWebHostEnvironment _environment) : IConfigurationProvider, IDisposable
+    ILogger<DatabaseConfigurationProvider> logger) : IConfigurationProvider, IDisposable
 {
     private readonly IDbContextFactory<ConfigurationDbContext> _dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
-    private readonly Dictionary<string, string?> _store = new(StringComparer.Ordinal);
-    private readonly object _reloadLock = new();
+    private readonly ILogger<DatabaseConfigurationProvider> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+    // The dictionary instance will be atomically swapped on reloads.
+    private ConcurrentDictionary<string, string?> _store = new(StringComparer.Ordinal);
+    private readonly Lock _reloadLock = new();
+
+    // Change token support
     private CancellationTokenSource _reloadTokenSource = new();
-    private DateTimeOffset _lastChecked = DateTimeOffset.MinValue;
+
+    // Track last seen (timestamp, key) pair to support deterministic delta loads.
+    // Start at MinValue so first delta grabs everything.
+    private DateTimeOffset _lastTimestamp = DateTimeOffset.MinValue;
+    private string _lastKey = string.Empty;
+
     private bool _disposed;
 
-    // ---------------------------------------------------------
-    // IConfigurationProvider Implementation
-    // ---------------------------------------------------------
+    // Configuration for retries and paging
+    private readonly int _maxRetries = 3;
+    private readonly TimeSpan _baseRetryDelay = TimeSpan.FromSeconds(1);
+
+    // ----------------------------
+    // IConfigurationProvider API
+    // ----------------------------
 
     public bool TryGet(string key, out string? value) =>
         _store.TryGetValue(key, out value);
@@ -27,9 +44,13 @@ public sealed class DatabaseConfigurationProvider(
     {
         ArgumentNullException.ThrowIfNull(key);
 
-        _logger.LogDebug("Manual config set: {Key} updated.", key);
+        if(_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Manual config set: {Key}.", key);
 
+        // Update current store atomically (ConcurrentDictionary is safe for calls)
         _store[key] = value;
+
+        // Notify consumers
         TriggerReload();
     }
 
@@ -38,139 +59,345 @@ public sealed class DatabaseConfigurationProvider(
 
     public IEnumerable<string> GetChildKeys(IEnumerable<string> earlierKeys, string? parentPath)
     {
-        var prefix = string.IsNullOrEmpty(parentPath) ? "" : parentPath + ":";
+        var prefix = string.IsNullOrEmpty(parentPath) ? string.Empty : parentPath + ":";
 
         return _store.Keys
             .Where(k => k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            .Select(k => k.Substring(prefix.Length))
+            .Select(k => k[prefix.Length..])
             .Concat(earlierKeys)
             .OrderBy(k => k, StringComparer.OrdinalIgnoreCase);
     }
 
-    // ---------------------------------------------------------
-    // Initial Load (Full Load)
-    // ---------------------------------------------------------
-
+    /// <summary>
+    /// Synchronous full load required by IConfigurationProvider.
+    /// Uses synchronous EF Core queries to avoid deadlock in sync contexts.
+    /// </summary>
     public void Load()
     {
-        _logger.LogInformation("Loading configuration entries from database (full load).");
+        // We intentionally call the synchronous path here because IConfigurationProvider.Load is sync.
+        // The async variants (LoadAsync / CheckAndReloadIfNeededAsync) are preferred in hosted scenarios.
+        _logger.LogInformation("ConfigurationProvider: performing synchronous full load.");
 
+        // Run a sync DB query. This uses the sync DbContext creation API.
         using var db = _dbFactory.CreateDbContext();
 
-        _store.Clear();
-
-        if(_environment.IsDevelopment())
+        // Read all entries in a deterministic order
+        List<ConfigurationEntry> entries;
+        try
         {
-            _logger.LogInformation("Ensuring database is created (Development environment).");
-            EnsureCreatedAsync(db).GetAwaiter().GetResult();
+            entries = [.. db.Configurations
+                .OrderBy(e => e.LastUpdated)
+                .ThenBy(e => e.Key)
+                .AsNoTracking()]; // sync
         }
-        var entries = db.TConfigurations
-            .TagWith("DatabaseConfigurationProvider: Full Load")
-            .OrderBy(e => e.Key)
-            .ToList();
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Full synchronous configuration load failed.");
+            throw;
+        }
+
+        // Build new store and atomically swap
+        var newStore = new ConcurrentDictionary<string, string?>(StringComparer.Ordinal);
+        DateTimeOffset maxTimestamp = _lastTimestamp;
+        string maxKey = _lastKey;
 
         foreach (var e in entries)
         {
-            _store[e.Key] = e.Value;
-            if (e.LastUpdated > _lastChecked)
-                _lastChecked = e.LastUpdated;
+            newStore[e.Key] = e.Value;
+
+            if (e.LastUpdated > maxTimestamp ||
+               (e.LastUpdated == maxTimestamp && string.CompareOrdinal(e.Key, maxKey) > 0))
+            {
+                maxTimestamp = e.LastUpdated;
+                maxKey = e.Key;
+            }
         }
 
-        if (_lastChecked == DateTimeOffset.MinValue)
-            _lastChecked = DateTimeOffset.UtcNow;
+        // If no entries found, ensure we have at least the current time to avoid infinite reprocessing.
+        if (entries.Count == 0 && _lastTimestamp == DateTimeOffset.MinValue)
+        {
+            maxTimestamp = DateTimeOffset.UtcNow;
+            maxKey = string.Empty;
+        }
 
-        _logger.LogInformation(
-            "Full configuration load completed. Loaded {Count} entries.",
-            entries.Count
-        );
+        Interlocked.Exchange(ref _store, newStore);
+        _lastTimestamp = maxTimestamp;
+        _lastKey = maxKey;
+
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation("Synchronous full load complete. Loaded {Count} entries.", newStore.Count);
     }
 
-    private async Task EnsureCreatedAsync(ConfigurationDbContext dbContext)
+    // ----------------------------
+    // Async API - preferred for hosted polling
+    // ----------------------------
+
+    /// <summary>
+    /// Perform a full asynchronous load (safe, atomic swap).
+    /// </summary>
+    public async Task LoadAsync(CancellationToken cancellation = default)
     {
-        await dbContext.Database.EnsureCreatedAsync();
-    }
-    // ---------------------------------------------------------
-    // Polling Logic
-    // ---------------------------------------------------------
+        _logger.LogInformation("ConfigurationProvider: performing async full load.");
 
+        await ExecuteWithRetriesAsync(async ct =>
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
+
+            // Read everything ordered by (LastUpdated, Key)
+            var entries = await db.Configurations
+                .AsNoTracking()
+                .OrderBy(e => e.LastUpdated)
+                .ThenBy(e => e.Key)
+                .ToListAsync(ct)
+                .ConfigureAwait(false);
+
+            var newStore = new ConcurrentDictionary<string, string?>(StringComparer.Ordinal);
+
+            DateTimeOffset maxTimestamp = _lastTimestamp;
+            string maxKey = _lastKey;
+
+            foreach (var e in entries)
+            {
+                newStore[e.Key] = e.Value;
+
+                if (e.LastUpdated > maxTimestamp ||
+                   (e.LastUpdated == maxTimestamp && string.CompareOrdinal(e.Key, maxKey) > 0))
+                {
+                    maxTimestamp = e.LastUpdated;
+                    maxKey = e.Key;
+                }
+            }
+
+            if (entries.Count == 0 && _lastTimestamp == DateTimeOffset.MinValue)
+            {
+                maxTimestamp = DateTimeOffset.UtcNow;
+                maxKey = string.Empty;
+            }
+
+            // Atomically swap the store so readers see a consistent snapshot
+            Interlocked.Exchange(ref _store, newStore);
+            _lastTimestamp = maxTimestamp;
+            _lastKey = maxKey;
+
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Async full load complete. Loaded {Count} entries.", newStore.Count);
+
+        }, cancellation).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Check database for delta updates and apply them to an atomic copy of the store.
+    /// Uses (LastUpdated >= lastTimestamp) fetch and then filters in-memory to handle tie-breaker.
+    /// </summary>
     public async Task CheckForUpdatesAsync(CancellationToken cancellation = default)
     {
-        _logger.LogDebug("Checking for configuration updates since {LastChecked}.", _lastChecked);
+        if (_logger.IsEnabled(LogLevel.Debug))
+            _logger.LogDebug("Checking for configuration updates since ({Timestamp}, {Key}).", _lastTimestamp, _lastKey);
 
-        using var db = _dbFactory.CreateDbContext();
-
-        var changedEntries = await db.TConfigurations
-            .TagWith("DatabaseConfigurationProvider: Delta Load (LastUpdated > _lastChecked)")
-            .Where(e => e.LastUpdated > _lastChecked)
-            .OrderBy(e => e.Key)
-            .ToListAsync(cancellation);
-
-        if (changedEntries.Count == 0)
+        await ExecuteWithRetriesAsync(async ct =>
         {
-            _logger.LogDebug("No configuration changes detected.");
-            return;
-        }
+            await using var db = await _dbFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
 
-        foreach (var e in changedEntries)
-        {
-            _logger.LogInformation("Config changed: {Key}", e.Key);
+            // Get all rows with LastUpdated >= lastTimestamp (may include some that we already processed for tie-break).
+            // We order so we can determine the new maximum (timestamp, key).
+            var rows = await db.Configurations
+                .AsNoTracking()
+                .Where(e => e.LastUpdated >= _lastTimestamp)
+                .OrderBy(e => e.LastUpdated)
+                .ThenBy(e => e.Key)
+                .ToListAsync(ct)
+                .ConfigureAwait(false);
 
-            _store[e.Key] = e.Value;
-            if (e.LastUpdated > _lastChecked)
-                _lastChecked = e.LastUpdated;
-        }
+            if (rows.Count == 0)
+            {
+                _logger.LogDebug("No updated configuration rows found.");
+                return;
+            }
 
-        _logger.LogInformation(
-            "Delta load applied. Updated {Count} entries.",
-            changedEntries.Count
-        );
+            // Build a copy of the current store (shallow copy) so we apply delta changes atomically.
+            var working = new ConcurrentDictionary<string, string?>(_store, StringComparer.Ordinal);
+
+            DateTimeOffset maxTimestamp = _lastTimestamp;
+            string maxKey = _lastKey;
+
+            int applied = 0;
+
+            foreach (var e in rows)
+            {
+                // Determine whether this row is new w.r.t (lastTimestamp, lastKey)
+                var isNew =
+                    (e.LastUpdated > _lastTimestamp) ||
+                    (e.LastUpdated == _lastTimestamp && string.CompareOrdinal(e.Key, _lastKey) > 0);
+
+                if (!isNew)
+                    continue;
+
+                working[e.Key] = e.Value;
+                applied++;
+
+                if (e.LastUpdated > maxTimestamp ||
+                   (e.LastUpdated == maxTimestamp && string.CompareOrdinal(e.Key, maxKey) > 0))
+                {
+                    maxTimestamp = e.LastUpdated;
+                    maxKey = e.Key;
+                }
+            }
+
+            if (applied == 0)
+            {
+                _logger.LogDebug("Delta query returned rows, but none were newer than current position.");
+                return;
+            }
+
+            // Atomically swap the store
+            Interlocked.Exchange(ref _store, working);
+            _lastTimestamp = maxTimestamp;
+            _lastKey = maxKey;
+
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Applied {Applied} configuration updates. New position: ({Timestamp}, {Key})",
+                applied, _lastTimestamp, _lastKey);
+
+        }, cancellation).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Convenience method: check for updates and if any were applied, trigger a reload token.
+    /// </summary>
     public async Task CheckAndReloadIfNeededAsync(CancellationToken cancellation = default)
     {
-        var before = _lastChecked;
+        var beforeTimestamp = _lastTimestamp;
+        var beforeKey = _lastKey;
 
         await CheckForUpdatesAsync(cancellation).ConfigureAwait(false);
 
-        if (_lastChecked > before)
+        // If either part advanced, fire a change token.
+        if (_lastTimestamp > beforeTimestamp || (_lastTimestamp == beforeTimestamp && string.CompareOrdinal(_lastKey, beforeKey) > 0))
         {
-            _logger.LogInformation("Detected configuration changes. Reloading.");
+            _logger.LogInformation("Configuration changes detected; issuing reload token.");
             TriggerReload();
         }
     }
 
-    // ---------------------------------------------------------
-    // Change Token Trigger
-    // ---------------------------------------------------------
+    // ----------------------------
+    // Change token helpers
+    // ----------------------------
 
     public void TriggerReload()
     {
+        // Use lock & Interlocked.Exchange pattern to be safe
         lock (_reloadLock)
         {
-            _logger.LogDebug("Firing configuration reload token.");
+            _logger.LogDebug("Triggering config reload token.");
 
-            var oldCts = _reloadTokenSource;
-            _reloadTokenSource = new CancellationTokenSource();
-
-            try { oldCts.Cancel(); } catch { }
-            oldCts.Dispose();
+            var old = Interlocked.Exchange(ref _reloadTokenSource, new CancellationTokenSource());
+            try
+            {
+                old.Cancel();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Exception while cancelling old reload token (ignored).");
+            }
+            finally
+            {
+                old.Dispose();
+            }
         }
     }
 
-    // ---------------------------------------------------------
-    // Cleanup
-    // ---------------------------------------------------------
-
-    public void Reload() => Load();
+    // ----------------------------
+    // Dispose
+    // ----------------------------
 
     public void Dispose()
     {
         if (_disposed) return;
 
         _logger.LogDebug("Disposing DatabaseConfigurationProvider.");
+        try
+        {
+            var cts = Interlocked.Exchange(ref _reloadTokenSource, new CancellationTokenSource());
+            try { cts.Cancel(); } catch { }
+            cts.Dispose();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Exception while disposing provider reload token.");
+        }
 
-        _reloadTokenSource.Cancel();
-        _reloadTokenSource.Dispose();
         _disposed = true;
+        GC.SuppressFinalize(this);
+    }
+
+    // ----------------------------
+    // Helpers
+    // ----------------------------
+
+    /// <summary>
+    /// Execute an async action with simple retry/backoff for transient DB failures.
+    /// </summary>
+    private async Task ExecuteWithRetriesAsync(Func<CancellationToken, Task> action, CancellationToken cancellation = default)
+    {
+        var attempt = 0;
+        var delay = _baseRetryDelay;
+
+        while (true)
+        {
+            cancellation.ThrowIfCancellationRequested();
+            try
+            {
+                await action(cancellation).ConfigureAwait(false);
+                return;
+            }
+            catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
+            {
+                // Propagate cancellation
+                throw;
+            }
+            catch (Exception ex) when (IsTransient(ex) && attempt < _maxRetries)
+            {
+                attempt++;
+
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning(ex, "Transient DB error while performing configuration operation (attempt {Attempt}). Retrying in {Delay}.", attempt, delay);
+                
+                try
+                {
+                    await Task.Delay(delay, cancellation).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) { throw; }
+
+                delay = TimeSpan.FromMilliseconds(delay.TotalMilliseconds * 2); // exponential backoff
+                continue;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Non-transient error while performing configuration operation.");
+                throw;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Basic heuristic for transient exceptions. You can swap this for Polly or a better detector.
+    /// </summary>
+    private static bool IsTransient(Exception ex)
+    {
+        // Very small heuristic:
+        // - EF Core DbUpdateException/DbException may be wrapped; inspect inner exceptions.
+        // - Network/timeout exceptions should be considered transient.
+        // For production, integrate with a proper transient fault handling library (Polly).
+        var baseEx = ex;
+        while (baseEx.InnerException != null) baseEx = baseEx.InnerException;
+
+        var typeName = baseEx.GetType().Name;
+
+        return typeName.Contains("Timeout", StringComparison.OrdinalIgnoreCase)
+            || typeName.Contains("Transient", StringComparison.OrdinalIgnoreCase)
+            || typeName.Contains("Sql", StringComparison.OrdinalIgnoreCase)
+            || typeName.Contains("MySql", StringComparison.OrdinalIgnoreCase)
+            || typeName.Contains("Npgsql", StringComparison.OrdinalIgnoreCase)
+            || typeName.Contains("DbException", StringComparison.OrdinalIgnoreCase);
     }
 }

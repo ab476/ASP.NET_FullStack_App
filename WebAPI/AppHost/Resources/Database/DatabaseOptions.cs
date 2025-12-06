@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AppHost.Resources.Database;
+﻿namespace AppHost.Resources.Database;
 
 public class DatabaseOptions
 {

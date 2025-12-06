@@ -40,7 +40,7 @@ public class ConfigurationDbContextTests : IAsyncLifetime
     {
         using var ctx = CreateContext();
 
-        ctx.TConfigurations.Should().NotBeNull();
+        ctx.Configurations.Should().NotBeNull();
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class ConfigurationDbContextTests : IAsyncLifetime
     {
         using var ctx = CreateContext();
 
-        var entity = ctx.Model.FindEntityType(typeof(TConfigurationEntry));
+        var entity = ctx.Model.FindEntityType(typeof(ConfigurationEntry));
 
         entity.Should().NotBeNull();
         var pk = entity.FindPrimaryKey();
@@ -71,7 +71,7 @@ public class ConfigurationDbContextTests : IAsyncLifetime
     {
         using var ctx = CreateContext();
 
-        var prop = ctx.Model.FindEntityType(typeof(TConfigurationEntry))?.FindProperty("Key");
+        var prop = ctx.Model.FindEntityType(typeof(ConfigurationEntry))?.FindProperty("Key");
 
         prop.Should().NotBeNull();
         prop.GetMaxLength().Should().Be(256);
@@ -83,7 +83,7 @@ public class ConfigurationDbContextTests : IAsyncLifetime
     {
         using var ctx = CreateContext();
 
-        var prop = ctx.Model.FindEntityType(typeof(TConfigurationEntry))?.FindProperty("Value");
+        var prop = ctx.Model.FindEntityType(typeof(ConfigurationEntry))?.FindProperty("Value");
 
         prop.Should().NotBeNull();
         prop.GetMaxLength().Should().Be(500);
@@ -95,7 +95,7 @@ public class ConfigurationDbContextTests : IAsyncLifetime
     {
         using var ctx = CreateContext();
 
-        var entity = ctx.Model.FindEntityType(typeof(TConfigurationEntry));
+        var entity = ctx.Model.FindEntityType(typeof(ConfigurationEntry));
 
         entity.Should().NotBeNull();
         var index = entity.GetIndexes()
@@ -109,7 +109,7 @@ public class ConfigurationDbContextTests : IAsyncLifetime
     {
         using var ctx = CreateContext();
 
-        var entity = ctx.Model.FindEntityType(typeof(TConfigurationEntry));
+        var entity = ctx.Model.FindEntityType(typeof(ConfigurationEntry));
 
         entity.Should().NotBeNull();
         var index = entity.GetIndexes()

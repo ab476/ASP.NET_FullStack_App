@@ -1,5 +1,4 @@
-﻿using Aspire.Hosting.ApplicationModel;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 namespace AppHost.Resources.Database;
 
 public static class DatabaseContainerExtensions
@@ -85,10 +84,3 @@ public static class DatabaseContainerExtensions
         return new DatabaseResourceSet(oracle, configurationDb, authDb);
     }
 }
-
-public sealed record DatabaseResourceSetWithOptions(
-    DatabaseOptions Options,
-    IResourceBuilder<IResourceWithConnectionString> Instance,
-    IResourceBuilder<IResourceWithConnectionString> ConfigurationDb,
-    IResourceBuilder<IResourceWithConnectionString> AuthDb
-);

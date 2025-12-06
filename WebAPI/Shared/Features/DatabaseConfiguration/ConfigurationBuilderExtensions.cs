@@ -1,5 +1,9 @@
 ﻿using Common.Constants;
 using Common.Features.DatabaseConfiguration.Provider;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MySqlConnector;
 using System.Globalization;
 
@@ -10,75 +14,81 @@ public static class ConfigurationBuilderExtensions
     public static IConfigurationBuilder AddDatabaseConfiguration(
         this IConfigurationBuilder builder,
         IServiceCollection services,
-        Action<DatabaseConfigurationOptions> configure)
+        Action<DatabaseConfigurationOptions> configureOptions)
     {
-        var tempProvider = services.BuildServiceProvider();
-        var logger = tempProvider.GetRequiredService<ILoggerFactory>()
-            .CreateLogger("DatabaseConfigurationSetup");
+        // Register and bind options using standard .NET patterns
+        services.Configure(configureOptions);
 
-        logger.LogInformation("Initializing database configuration module.");
-
-        var options = new DatabaseConfigurationOptions()
+        // Register refresh interval provider (lazy resolution from IOptions instead of manual creation)
+        services.AddSingleton<IConfigRefreshInterval>(sp =>
         {
-            PollInterval = TimeSpan.FromMinutes(5),
-            EnablePooling = true,
-            DbScriptRoute = DatabaseConfigurationOptions.DefaultDbScriptRoute
-        };
-        configure.Invoke(options);
+            var opts = sp.GetRequiredService<IOptions<DatabaseConfigurationOptions>>().Value;
+            return new StaticConfigRefreshIntervalProvider(opts.PollInterval);
+        });
 
-        logger.LogDebug("DatabaseConfigurationOptions prepared: PollInterval={Interval}, EnablePooling={Pooling}.",
-            options.PollInterval,
-            options.EnablePooling);
+        // Register provider only once
+        services.AddSingleton<DatabaseConfigurationProvider>();
 
-        var configuration = tempProvider.GetRequiredService<IConfiguration>();
-        logger.LogInformation("Configuring DbContextFactory for configuration store.");
+        // Hosted service only if polling is enabled
+        services.AddHostedService(sp =>
+        {
+            var opts = sp.GetRequiredService<IOptions<DatabaseConfigurationOptions>>().Value;
+            var logger = sp.GetRequiredService<ILoggerFactory>()
+                           .CreateLogger("DatabaseConfigurationSetup");
 
+            if (!opts.EnablePooling)
+            {
+                logger.LogWarning("Database configuration polling is disabled.");
+                return new DisabledHostedService();
+            }
+
+            return new DatabaseConfigurationHostedService(
+                sp.GetRequiredService<DatabaseConfigurationProvider>(),
+                sp.GetRequiredService<IConfigRefreshInterval>(),
+                logger);
+        });
+
+        // Register our DbContextFactory using correct DI patterns
         services.AddPooledDbContextFactory<ConfigurationDbContext>((sp, dbOptions) =>
         {
+            var opts = sp.GetRequiredService<IOptions<DatabaseConfigurationOptions>>().Value;
+            var logger = sp.GetRequiredService<ILoggerFactory>().CreateLogger("DbConfig");
+
             var configDb = sp.GetRequiredKeyedService<MySqlDataSource>(ResourceNames.ConfigurationDb);
             var connectionString = configDb.ConnectionString;
 
             dbOptions
                 .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-                .UseSnakeCaseNamingConvention(CultureInfo.CurrentCulture)
+                .UseSnakeCaseNamingConvention(CultureInfo.InvariantCulture)
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            options.ConfigureDbContext?.Invoke(dbOptions);
 
-            if(dbOptions.IsConfigured)
-            {
-                logger.LogInformation("DbContextOptions have been configured.");
-            }
-            else
-            {
-                logger.LogError("DbContextOptions have not been configured. Please ensure ConfigureDbContext is set in DatabaseConfigurationOptions.");
-            }
+            // Allow user-defined customizations
+            opts.ConfigureDbContext?.Invoke(dbOptions);
+
+            logger.LogInformation("ConfigurationDbContext configured (pooling={Pooling}).",
+                opts.EnablePooling);
         });
-        
 
-        logger.LogInformation("Registered IConfigRefreshInterval with interval {Interval}.", options.PollInterval);
-        services.AddSingleton<IConfigRefreshInterval>(new StaticConfigRefreshIntervalProvider(options.PollInterval));
-
-        logger.LogInformation("Registering DatabaseConfigurationProvider.");
-        services.AddSingleton<DatabaseConfigurationProvider>();
-
-        if (options.EnablePooling)
+        // Add configuration source WITHOUT resolving services early
+        builder.Add(new DatabaseConfigurationSource(sp =>
         {
-            logger.LogInformation("Registering DatabaseConfigurationHostedService for background polling.");
-            services.AddHostedService<DatabaseConfigurationHostedService>();
-        }
-        else
-        {
-            logger.LogWarning("Polling service is disabled. Configuration updates will not be auto-refreshed.");
-        }
+            var logger = sp.GetRequiredService<ILoggerFactory>()
+                           .CreateLogger("DatabaseConfigurationSetup");
 
-        var finalProvider = services.BuildServiceProvider();
-        var configProvider = finalProvider.GetRequiredService<DatabaseConfigurationProvider>();
+            logger.LogInformation("DatabaseConfigurationProvider added to configuration pipeline.");
 
-        logger.LogInformation("Adding DatabaseConfigurationProvider to configuration pipeline.");
-        builder.Add(new DatabaseConfigurationSource(configProvider));
+            return sp.GetRequiredService<DatabaseConfigurationProvider>();
+        }));
 
-        logger.LogInformation("Database configuration setup completed successfully.");
-        
         return builder;
+    }
+
+    /// <summary>
+    /// Used when polling is disabled to satisfy AddHostedService requirement.
+    /// </summary>
+    private sealed class DisabledHostedService : IHostedService
+    {
+        public Task StartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+        public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

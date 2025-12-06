@@ -1,8 +1,4 @@
-
-
-
 using AppHost.Resources.Database;
-using Microsoft.Extensions.Configuration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 // 1. Add the Redis resource

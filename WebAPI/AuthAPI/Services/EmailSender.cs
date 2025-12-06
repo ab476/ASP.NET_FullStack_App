@@ -1,5 +1,4 @@
 ﻿using AuthAPI.Data.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace AuthAPI.Services;
 
