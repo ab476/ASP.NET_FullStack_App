@@ -13,7 +13,6 @@ public class RefreshTokenRepository(AuthDbContext _db, ITimeProvider _clock) : I
 
     public Task<TRefreshToken?> GetByHashAsync(string tokenHash, CancellationToken ct)
         => TRefreshTokens
-            .AsNoTracking()
             .TagWith("RefreshToken.GetByHash")
             .TagWith($"Hash={tokenHash}")
             .Where(r => r.TokenHash == tokenHash)
@@ -21,7 +20,6 @@ public class RefreshTokenRepository(AuthDbContext _db, ITimeProvider _clock) : I
 
     public Task<List<TRefreshToken>> GetActiveForUserAsync(Guid userId, CancellationToken ct)
         => ActiveTRefreshTokens
-            .AsNoTracking()
             .TagWith("RefreshToken.GetActiveForUser")
             .TagWith($"UserId={userId}")
             .Where(r => r.UserId == userId)
